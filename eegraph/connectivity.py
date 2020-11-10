@@ -1,7 +1,7 @@
 from .tools import *
 
 
-def cross_correlation(path, window_size, exclude = [None], threshold = 0.7):
+def cross_correlation(path, window_size, exclude = [None], threshold = 0.4):
     conn = 'cc'
     
     data = input_data_type(path, exclude)
