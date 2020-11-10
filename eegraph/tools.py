@@ -322,9 +322,9 @@ def calculate_conn(data_intervals, i, j, sample_rate, conn):
         x = data_intervals[i]
         y = data_intervals[j]
         
-        Rxy = np.correlate(x,y, 'full')
-        Rxx = np.correlate(x,x, 'full')
-        Ryy = np.correlate(y,y, 'full')
+        Rxy = signal.correlate(x,y, 'full')
+        Rxx = signal.correlate(x,x, 'full')
+        Ryy = signal.correlate(y,y, 'full')
         
         lags = np.arange(-len(data_intervals[i]) + 1, len(data_intervals[i]))
         lag_0 = int((np.where(lags==0))[0])
@@ -333,9 +333,9 @@ def calculate_conn(data_intervals, i, j, sample_rate, conn):
         Ryy_0 = Ryy[lag_0]
         
         Rxy_norm = (1/(np.sqrt(Rxx_0*Ryy_0)))* Rxy
-
-        #We use the mean from lag 0 to a 30% displacement. 
-        disp = round((len(data_intervals[i])) * 0.3)
+        
+        #We use the mean from lag 0 to a 10% displacement. 
+        disp = round((len(data_intervals[i])) * 0.10)
 
         Rxy_coef = Rxy_norm[lag_0: lag_0 + disp].mean()
         
@@ -344,7 +344,6 @@ def calculate_conn(data_intervals, i, j, sample_rate, conn):
     if conn == 'pearson':
         r, p_value = (stats.pearsonr(data_intervals[i],data_intervals[j]))
         
-        print(r)
         return r
     
     if conn == 'coh':
