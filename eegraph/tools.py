@@ -337,9 +337,9 @@ def calculate_conn(data_intervals, i, j, sample_rate, conn):
         #We use the mean from lag 0 to a 10% displacement. 
         disp = round((len(data_intervals[i])) * 0.10)
 
-        Rxy_coef = Rxy_norm[lag_0: lag_0 + disp].mean()
+        cc_coef = Rxy_norm[lag_0: lag_0 + disp].mean()
         
-        return Rxy_coef
+        return cc_coef
     
     if conn == 'pearson':
         r, p_value = (stats.pearsonr(data_intervals[i],data_intervals[j]))
@@ -357,7 +357,31 @@ def calculate_conn(data_intervals, i, j, sample_rate, conn):
         icoh = np.imag(Pxy)/(np.sqrt(Pxx*Pyy))
         return f, icoh
     
+    if conn == 'corcc':
+        x = data_intervals[i]
+        y = data_intervals[j]
+        
+        Rxy = signal.correlate(x,y, 'full')
+        Rxx = signal.correlate(x,x, 'full')
+        Ryy = signal.correlate(y,y, 'full')
+        
+        lags = np.arange(-len(data_intervals[i]) + 1, len(data_intervals[i]))
+        lag_0 = int((np.where(lags==0))[0])
 
+        Rxx_0 = Rxx[lag_0]
+        Ryy_0 = Ryy[lag_0]
+        
+        Rxy_norm = (1/(np.sqrt(Rxx_0*Ryy_0)))* Rxy
+        negative_lag = Rxy_norm[:lag_0]
+        positive_lag = Rxy_norm[lag_0 + 1:]
+        
+        corCC = positive_lag - negative_lag
+        
+        disp = round((len(data_intervals[i])) * 0.15)
+        
+        corCC_coef = corCC[:disp].mean()
+        
+        return corCC_coef
 
 def make_graph(matrix, ch_names, threshold):
     """Process to create the networkX graphs.
@@ -518,7 +542,7 @@ def draw_graph(G):
                     layout=go.Layout(
                         titlefont_size=16,
                         showlegend=False,
-                        margin=dict(b=40, l=140, r=140, t=30),
+                        margin=dict(b=40, l=0, r=350, t=30),
                         xaxis_visible=False,
                         yaxis_visible=False),
                     )
