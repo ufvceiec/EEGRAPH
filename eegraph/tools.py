@@ -223,7 +223,7 @@ def frequency_bands(f,Y):
     f : list
         Frequency bins for given FFT parameters.
     Y : ndarray
-        Values calculated with the Fast Fourier Transform.
+        Array of values from which we divide into frequency bands. 
     
     Returns
     -------
@@ -246,11 +246,11 @@ def frequency_bands(f,Y):
     gamma_range = (30,45)
     
     #delta = ( Y[(f>delta_range[0]) & (f<=delta_range[1])].mean())
-    delta = Y[(f>delta_range[0]) & (f<=delta_range[1])].mean()
-    theta = Y[(f>theta_range[0]) & (f<=theta_range[1])].mean()
-    alpha = Y[(f>alpha_range[0]) & (f<=alpha_range[1])].mean()
-    beta = Y[(f>beta_range[0]) & (f<=beta_range[1])].mean()
-    gamma = Y[(f>gamma_range[0]) & (f<=gamma_range[1])].mean()
+    delta = Y[(f>delta_range[0]) & (f<=delta_range[1])]
+    theta = Y[(f>theta_range[0]) & (f<=theta_range[1])]
+    alpha = Y[(f>alpha_range[0]) & (f<=alpha_range[1])]
+    beta = Y[(f>beta_range[0]) & (f<=beta_range[1])]
+    gamma = Y[(f>gamma_range[0]) & (f<=gamma_range[1])]
 
     return delta, theta, alpha, beta, gamma
 
@@ -288,8 +288,8 @@ def calculate_connectivity(data_intervals, steps, channels, sample_rate, conn):
                 matrix[k][x,y] = calculate_conn(data_intervals, i, j, sample_rate, conn)
 
     return matrix
-    
-        
+
+
 def calculate_connectivity_with_bands(data_intervals, steps, channels, sample_rate, conn, bands):
     #Calculate the number of bands, number of intervals and create the matrix. 
     num_bands = sum(bands)
@@ -306,8 +306,7 @@ def calculate_connectivity_with_bands(data_intervals, steps, channels, sample_ra
         #Loop over 
         for x,i in enumerate(range(start, stop)):
             for y,j in enumerate(range(start, stop)):
-                f, Cxy = calculate_conn(data_intervals, i, j, sample_rate, conn)
-                delta, theta, alpha, beta, gamma = frequency_bands(f, Cxy)
+                delta, theta, alpha, beta, gamma = calculate_conn(data_intervals, i, j, sample_rate, conn)
                 r=0
                 for z, item in enumerate ([delta, theta, alpha, beta, gamma]):
                     if bands[z]:
@@ -348,14 +347,20 @@ def calculate_conn(data_intervals, i, j, sample_rate, conn):
     
     if conn == 'coh':
         f, Cxy = (signal.coherence(data_intervals[i], data_intervals[j], sample_rate))
-        return f, Cxy
+        
+        delta, theta, alpha, beta, gamma = frequency_bands(f, Cxy)
+        
+        return delta.mean(), theta.mean(), alpha.mean(), beta.mean(), gamma.mean()
     
     if conn == 'icoh':
         _, Pxx = signal.welch(data_intervals[i], fs=sample_rate)
         _, Pyy = signal.welch(data_intervals[j], fs=sample_rate)
         f, Pxy = signal.csd(data_intervals[i],data_intervals[j],fs=sample_rate)
         icoh = np.imag(Pxy)/(np.sqrt(Pxx*Pyy))
-        return f, icoh
+        
+        delta, theta, alpha, beta, gamma = frequency_bands(f, icoh)
+        
+        return delta.mean(), theta.mean(), alpha.mean(), beta.mean(), gamma.mean()
     
     if conn == 'corcc':
         x = data_intervals[i]
@@ -382,6 +387,30 @@ def calculate_conn(data_intervals, i, j, sample_rate, conn):
         corCC_coef = corCC[:disp].mean()
         
         return corCC_coef
+    
+    if conn == 'wpli':
+        f, Pxy = signal.csd(data_intervals[i],data_intervals[j],fs=sample_rate)
+        
+        delta, theta, alpha, beta, gamma = frequency_bands(f, Pxy)
+        
+        wpli_delta = abs(np.mean(abs(np.imag(delta)) * np.sign(np.imag(delta)))) / (np.mean(abs(np.imag(delta))))
+        #print('wpli_delta:',wpli_delta)
+        
+        wpli_theta = abs(np.mean(abs(np.imag(theta)) * np.sign(np.imag(theta)))) / (np.mean(abs(np.imag(theta))))
+        #print('wpli_theta:',wpli_theta)
+        
+        wpli_alpha = abs(np.mean(abs(np.imag(alpha)) * np.sign(np.imag(alpha)))) / (np.mean(abs(np.imag(alpha))))
+        print('wpli_alpha:',wpli_alpha)
+        
+        wpli_beta = abs(np.mean(abs(np.imag(beta)) * np.sign(np.imag(beta)))) / (np.mean(abs(np.imag(beta))))
+        #print('wpli_beta:',wpli_beta)
+        
+        wpli_gamma = abs(np.mean(abs(np.imag(gamma)) * np.sign(np.imag(gamma)))) / (np.mean(abs(np.imag(gamma))))
+        #print('wpli_beta:',wpli_beta)
+        
+        return wpli_delta, wpli_theta, wpli_alpha, wpli_beta, wpli_gamma
+        
+        
 
 def make_graph(matrix, ch_names, threshold):
     """Process to create the networkX graphs.
