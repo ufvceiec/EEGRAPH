@@ -94,3 +94,19 @@ def wPLI(path, window_size, bands, exclude = [None], threshold = 0.45):
     connectivity_matrix = calculate_connectivity_with_bands(data_intervals, steps, num_channels, sample_rate, conn, wanted_bands)
 
     make_graph(connectivity_matrix, ch_names,  threshold)
+    
+    
+def plv(path, window_size, bands, exclude = [None], threshold = 0.83):
+    conn = 'plv'
+    
+    data = input_data_type(path, exclude)
+    
+    raw_data, num_channels, sample_rate, sample_duration, ch_names = get_display_info(data)
+    
+    wanted_bands = input_bands(bands)
+    
+    data_intervals, steps = time_intervals(raw_data, sample_rate, sample_duration, window_size)
+    
+    connectivity_matrix = calculate_connectivity_with_bands(data_intervals, steps, num_channels, sample_rate, conn, wanted_bands)
+        
+    make_graph(connectivity_matrix, ch_names,  threshold)

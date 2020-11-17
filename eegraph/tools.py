@@ -216,6 +216,38 @@ def time_stamps(seconds, sample_rate, sample_length, sample_duration):
     return intervals
 
 
+def calculate_bands_fft(values, sample_rate):
+    """Process to calculate the numpy fft for the snippets.
+    Parameters
+    ----------
+    values : array
+        Snippet of values for the signal.
+    sample_rate : float
+        Sample frequency used in the EEG (Hz).
+    
+    Returns
+    -------
+    fft_freq : list
+        Frequency bins for given FFT parameters.
+    fft_vals : ndarray
+        Values calculated with the Fast Fourier Transform.
+    """
+    
+    fft_vals = np.absolute(np.fft.fft(values))
+    fft_freq = np.fft.fftfreq(len(values), 1/sample_rate)
+    
+    
+    delta1, theta1, alpha1, beta1, gamma1 = frequency_bands(fft_freq, fft_vals)
+    
+    delta = np.absolute(np.fft.ifft(delta1))
+    theta= np.absolute(np.fft.ifft(theta1))
+    alpha= np.absolute(np.fft.ifft(alpha1))
+    beta= np.absolute(np.fft.ifft(beta1))
+    gamma= np.absolute(np.fft.ifft(gamma1))
+    
+    return delta, theta, alpha, beta, gamma
+
+
 def frequency_bands(f,Y):
     """Process to obtain the values for each frequency band.
     Parameters
@@ -409,9 +441,53 @@ def calculate_conn(data_intervals, i, j, sample_rate, conn):
         #print('wpli_beta:',wpli_beta)
         
         return wpli_delta, wpli_theta, wpli_alpha, wpli_beta, wpli_gamma
+    
+    if conn == 'plv':
+        sig1_delta, sig1_theta, sig1_alpha, sig1_beta, sig1_gamma = calculate_bands_fft(data_intervals[i], sample_rate)
+        sig2_delta, sig2_theta, sig2_alpha, sig2_beta, sig2_gamma = calculate_bands_fft(data_intervals[j], sample_rate)
         
+        sig1_delta_hill = signal.hilbert(sig1_delta)
+        sig1_theta_hill = signal.hilbert(sig1_theta)
+        sig1_alpha_hill = signal.hilbert(sig1_alpha)
+        sig1_beta_hill = signal.hilbert(sig1_beta)
+        sig1_gamma_hill = signal.hilbert(sig1_gamma)
+        
+        sig2_delta_hill = signal.hilbert(sig2_delta)
+        sig2_theta_hill = signal.hilbert(sig2_theta)
+        sig2_alpha_hill = signal.hilbert(sig2_alpha)
+        sig2_beta_hill = signal.hilbert(sig2_beta)
+        sig2_gamma_hill = signal.hilbert(sig2_gamma)
+        
+        
+        #The instantaneous phase can then simply be obtained as the angle between the real and imaginary part of the analytic signal
+        sig1_delta_phase = np.angle(sig1_delta_hill)
+        sig1_theta_phase = np.angle(sig1_theta_hill)
+        sig1_alpha_phase = np.angle(sig1_alpha_hill)
+        sig1_beta_phase = np.angle(sig1_beta_hill)
+        sig1_gamma_phase = np.angle(sig1_gamma_hill)
+        
+        sig2_delta_phase = np.angle(sig2_delta_hill)
+        sig2_theta_phase = np.angle(sig2_theta_hill)
+        sig2_alpha_phase = np.angle(sig2_alpha_hill)
+        sig2_beta_phase = np.angle(sig2_beta_hill)
+        sig2_gamma_phase = np.angle(sig2_gamma_hill)
         
 
+        complex_phase_diff_delta = np.exp(np.complex(0,1)*(sig1_delta_phase - sig2_delta_phase))
+        complex_phase_diff_theta = np.exp(np.complex(0,1)*(sig1_theta_phase - sig2_theta_phase))
+        complex_phase_diff_alpha = np.exp(np.complex(0,1)*(sig1_alpha_phase - sig2_alpha_phase))
+        complex_phase_diff_beta = np.exp(np.complex(0,1)*(sig1_beta_phase - sig2_beta_phase))
+        complex_phase_diff_gamma = np.exp(np.complex(0,1)*(sig1_gamma_phase - sig2_gamma_phase))
+        
+        
+        plv_delta = np.abs(np.sum(complex_phase_diff_delta))/len(sig1_delta_phase)
+        plv_theta = np.abs(np.sum(complex_phase_diff_theta))/len(sig1_theta_phase)
+        plv_alpha = np.abs(np.sum(complex_phase_diff_alpha))/len(sig1_alpha_phase)
+        plv_beta = np.abs(np.sum(complex_phase_diff_beta))/len(sig1_beta_phase)
+        plv_gamma = np.abs(np.sum(complex_phase_diff_gamma))/len(sig1_gamma_phase)
+        
+        return plv_delta, plv_theta, plv_alpha, plv_beta, plv_gamma
+        
 def make_graph(matrix, ch_names, threshold):
     """Process to create the networkX graphs.
     Parameters
