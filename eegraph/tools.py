@@ -426,19 +426,10 @@ def calculate_conn(data_intervals, i, j, sample_rate, conn):
         delta, theta, alpha, beta, gamma = frequency_bands(f, Pxy)
         
         wpli_delta = abs(np.mean(abs(np.imag(delta)) * np.sign(np.imag(delta)))) / (np.mean(abs(np.imag(delta))))
-        #print('wpli_delta:',wpli_delta)
-        
         wpli_theta = abs(np.mean(abs(np.imag(theta)) * np.sign(np.imag(theta)))) / (np.mean(abs(np.imag(theta))))
-        #print('wpli_theta:',wpli_theta)
-        
-        wpli_alpha = abs(np.mean(abs(np.imag(alpha)) * np.sign(np.imag(alpha)))) / (np.mean(abs(np.imag(alpha))))
-        print('wpli_alpha:',wpli_alpha)
-        
+        wpli_alpha = abs(np.mean(abs(np.imag(alpha)) * np.sign(np.imag(alpha)))) / (np.mean(abs(np.imag(alpha)))) 
         wpli_beta = abs(np.mean(abs(np.imag(beta)) * np.sign(np.imag(beta)))) / (np.mean(abs(np.imag(beta))))
-        #print('wpli_beta:',wpli_beta)
-        
         wpli_gamma = abs(np.mean(abs(np.imag(gamma)) * np.sign(np.imag(gamma)))) / (np.mean(abs(np.imag(gamma))))
-        #print('wpli_beta:',wpli_beta)
         
         return wpli_delta, wpli_theta, wpli_alpha, wpli_beta, wpli_gamma
     
@@ -446,47 +437,70 @@ def calculate_conn(data_intervals, i, j, sample_rate, conn):
         sig1_delta, sig1_theta, sig1_alpha, sig1_beta, sig1_gamma = calculate_bands_fft(data_intervals[i], sample_rate)
         sig2_delta, sig2_theta, sig2_alpha, sig2_beta, sig2_gamma = calculate_bands_fft(data_intervals[j], sample_rate)
         
-        sig1_delta_hill = signal.hilbert(sig1_delta)
-        sig1_theta_hill = signal.hilbert(sig1_theta)
-        sig1_alpha_hill = signal.hilbert(sig1_alpha)
-        sig1_beta_hill = signal.hilbert(sig1_beta)
-        sig1_gamma_hill = signal.hilbert(sig1_gamma)
+        sig1_bands = instantaneous_phase([sig1_delta, sig1_theta, sig1_alpha, sig1_beta, sig1_gamma])
+        sig2_bands = instantaneous_phase([sig2_delta, sig2_theta, sig2_alpha, sig2_beta, sig2_gamma])
         
-        sig2_delta_hill = signal.hilbert(sig2_delta)
-        sig2_theta_hill = signal.hilbert(sig2_theta)
-        sig2_alpha_hill = signal.hilbert(sig2_alpha)
-        sig2_beta_hill = signal.hilbert(sig2_beta)
-        sig2_gamma_hill = signal.hilbert(sig2_gamma)
+        complex_phase_diff_delta = np.exp(np.complex(0,1)*(sig1_bands[0] - sig2_bands[0]))
+        complex_phase_diff_theta = np.exp(np.complex(0,1)*(sig1_bands[1] - sig2_bands[1]))
+        complex_phase_diff_alpha = np.exp(np.complex(0,1)*(sig1_bands[2] - sig2_bands[2]))
+        complex_phase_diff_beta = np.exp(np.complex(0,1)*(sig1_bands[3] - sig2_bands[3]))
+        complex_phase_diff_gamma = np.exp(np.complex(0,1)*(sig1_bands[4] - sig2_bands[4]))
         
-        
-        #The instantaneous phase can then simply be obtained as the angle between the real and imaginary part of the analytic signal
-        sig1_delta_phase = np.angle(sig1_delta_hill)
-        sig1_theta_phase = np.angle(sig1_theta_hill)
-        sig1_alpha_phase = np.angle(sig1_alpha_hill)
-        sig1_beta_phase = np.angle(sig1_beta_hill)
-        sig1_gamma_phase = np.angle(sig1_gamma_hill)
-        
-        sig2_delta_phase = np.angle(sig2_delta_hill)
-        sig2_theta_phase = np.angle(sig2_theta_hill)
-        sig2_alpha_phase = np.angle(sig2_alpha_hill)
-        sig2_beta_phase = np.angle(sig2_beta_hill)
-        sig2_gamma_phase = np.angle(sig2_gamma_hill)
-        
-
-        complex_phase_diff_delta = np.exp(np.complex(0,1)*(sig1_delta_phase - sig2_delta_phase))
-        complex_phase_diff_theta = np.exp(np.complex(0,1)*(sig1_theta_phase - sig2_theta_phase))
-        complex_phase_diff_alpha = np.exp(np.complex(0,1)*(sig1_alpha_phase - sig2_alpha_phase))
-        complex_phase_diff_beta = np.exp(np.complex(0,1)*(sig1_beta_phase - sig2_beta_phase))
-        complex_phase_diff_gamma = np.exp(np.complex(0,1)*(sig1_gamma_phase - sig2_gamma_phase))
-        
-        
-        plv_delta = np.abs(np.sum(complex_phase_diff_delta))/len(sig1_delta_phase)
-        plv_theta = np.abs(np.sum(complex_phase_diff_theta))/len(sig1_theta_phase)
-        plv_alpha = np.abs(np.sum(complex_phase_diff_alpha))/len(sig1_alpha_phase)
-        plv_beta = np.abs(np.sum(complex_phase_diff_beta))/len(sig1_beta_phase)
-        plv_gamma = np.abs(np.sum(complex_phase_diff_gamma))/len(sig1_gamma_phase)
+        plv_delta = np.abs(np.sum(complex_phase_diff_delta))/len(sig1_bands[0])
+        plv_theta = np.abs(np.sum(complex_phase_diff_theta))/len(sig1_bands[1])
+        plv_alpha = np.abs(np.sum(complex_phase_diff_alpha))/len(sig1_bands[2])
+        plv_beta = np.abs(np.sum(complex_phase_diff_beta))/len(sig1_bands[3])
+        plv_gamma = np.abs(np.sum(complex_phase_diff_gamma))/len(sig1_bands[4])
         
         return plv_delta, plv_theta, plv_alpha, plv_beta, plv_gamma
+    
+    if conn == 'pli':
+        sig1_delta, sig1_theta, sig1_alpha, sig1_beta, sig1_gamma = calculate_bands_fft(data_intervals[i], sample_rate)
+        sig2_delta, sig2_theta, sig2_alpha, sig2_beta, sig2_gamma = calculate_bands_fft(data_intervals[j], sample_rate)
+        
+        sig1_bands = instantaneous_phase([sig1_delta, sig1_theta, sig1_alpha, sig1_beta, sig1_gamma])
+        sig2_bands = instantaneous_phase([sig2_delta, sig2_theta, sig2_alpha, sig2_beta, sig2_gamma])
+        
+        phase_diff_delta = sig1_bands[0] - sig2_bands[0]
+        phase_diff_delta = (phase_diff_delta + np.pi) % (2 * np.pi) - np.pi
+        
+        phase_diff_theta = sig1_bands[1] - sig2_bands[1]
+        phase_diff_theta = (phase_diff_theta + np.pi) % (2 * np.pi) - np.pi
+        
+        phase_diff_alpha = sig1_bands[2] - sig2_bands[2]
+        phase_diff_alpha = (phase_diff_alpha + np.pi) % (2 * np.pi) - np.pi
+        
+        phase_diff_beta = sig1_bands[3] - sig2_bands[3]
+        phase_diff_beta  = (phase_diff_beta  + np.pi) % (2 * np.pi) - np.pi
+        
+        phase_diff_gamma = sig1_bands[4] - sig2_bands[4]
+        phase_diff_gamma  = (phase_diff_gamma  + np.pi) % (2 * np.pi) - np.pi
+        
+        pli_delta = abs(np.mean(np.sign(phase_diff_delta)))
+        pli_theta = abs(np.mean(np.sign(phase_diff_theta)))
+        pli_alpha = abs(np.mean(np.sign(phase_diff_alpha)))
+        pli_beta = abs(np.mean(np.sign(phase_diff_beta)))
+        pli_gamma = abs(np.mean(np.sign(phase_diff_gamma)))
+        
+        return pli_delta, pli_theta, pli_alpha, pli_beta, pli_gamma
+    
+    if conn == 'pli_no_bands':
+        sig1_phase = instantaneous_phase([data_intervals[i]])
+        sig2_phase = instantaneous_phase([data_intervals[j]])
+        phase_diff = sig1_phase[0] - sig2_phase[0]
+        phase_diff = (phase_diff  + np.pi) % (2 * np.pi) - np.pi
+        pli = abs(np.mean(np.sign(phase_diff)))
+        
+        return pli
+    
+def instantaneous_phase(bands):
+    for i,item in enumerate(bands):
+        #First obtain the analytical signal with hilbert transformation. 
+        bands[i] = signal.hilbert(item)
+        #The instantaneous phase can then simply be obtained as the angle between the real and imaginary part of the analytic signal
+        bands[i] = np.angle(bands[i])
+    return bands
+
         
 def make_graph(matrix, ch_names, threshold):
     """Process to create the networkX graphs.
