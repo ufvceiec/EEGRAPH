@@ -93,21 +93,17 @@ def input_bands(bands):
         Boolean list, with 5 positions one for each frequency band.
     """
     
-    #Split the string by the commas, lowercase and erase spaces. 
-    bands = bands.split(",")
-    input_bands = [elem.strip().lower() for elem in bands]
-    
     #Frequency bands.
     freq_bands = ['delta', 'theta', 'alpha', 'beta', 'gamma']
     wanted_bands = []
     
     #Loop over all frequency bands, and append True if it is in the input bands, otherwise append False. 
     for elem in freq_bands:
-        if elem in input_bands:
+        if elem in bands:
             wanted_bands.append(True)
         else:
             wanted_bands.append(False)
-    
+
     return wanted_bands
 
 
