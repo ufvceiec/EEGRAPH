@@ -4,6 +4,7 @@ import mne
 import matplotlib.pyplot as plt
 import networkx as nx
 import plotly.graph_objects as go
+import scot
 from scipy import signal, stats
 from math import pow
 
@@ -313,7 +314,7 @@ def calculate_connectivity(data_intervals, steps, channels, sample_rate, conn):
         #Loop over all possible pairs of channels in the interval calculating the cross correlation coefficient and saving it in the correlation matrix. 
         for x,i in enumerate(range(start, stop)):
             for y,j in enumerate(range(start, stop)):
-                matrix[k][x,y] = calculate_conn(data_intervals, i, j, sample_rate, conn)
+                matrix[k][x,y] = calculate_conn(data_intervals, i, j, sample_rate, conn, channels)
 
     return matrix
 
@@ -334,7 +335,7 @@ def calculate_connectivity_with_bands(data_intervals, steps, channels, sample_ra
         #Loop over 
         for x,i in enumerate(range(start, stop)):
             for y,j in enumerate(range(start, stop)):
-                delta, theta, alpha, beta, gamma = calculate_conn(data_intervals, i, j, sample_rate, conn)
+                delta, theta, alpha, beta, gamma = calculate_conn(data_intervals, i, j, sample_rate, conn, channels)
                 r=0
                 for z, item in enumerate ([delta, theta, alpha, beta, gamma]):
                     if bands[z]:
@@ -344,7 +345,7 @@ def calculate_connectivity_with_bands(data_intervals, steps, channels, sample_ra
     return matrix
 
 
-def calculate_conn(data_intervals, i, j, sample_rate, conn):
+def calculate_conn(data_intervals, i, j, sample_rate, conn, channels):
     if conn == 'cc':
         x = data_intervals[i]
         y = data_intervals[j]
@@ -376,6 +377,7 @@ def calculate_conn(data_intervals, i, j, sample_rate, conn):
     if conn == 'coh':
         f, Cxy = (signal.coherence(data_intervals[i], data_intervals[j], sample_rate))
         
+        print(f)
         delta, theta, alpha, beta, gamma = frequency_bands(f, Cxy)
         
         return delta.mean(), theta.mean(), alpha.mean(), beta.mean(), gamma.mean()
@@ -489,6 +491,25 @@ def calculate_conn(data_intervals, i, j, sample_rate, conn):
         
         return pli
     
+    if conn == 'dtf':
+        if i!=j:
+            data = np.zeros(shape=(2, 2048))
+            data[0] = data_intervals[i]
+            data[1] = data_intervals[j]
+
+            ws = scot.Workspace({'model_order': channels}, nfft = int(sample_rate/2))
+            ws.set_data(data)
+            ws.do_mvarica()
+            ws.fit_var()
+            results = ws.get_connectivity('DTF')
+            f = np.arange(0, int(sample_rate/2))
+
+            delta, theta, alpha, beta, gamma = frequency_bands(f, results[1][0])
+
+            return delta.mean(), theta.mean(), alpha.mean(), beta.mean(), gamma.mean()
+        else:
+            return 0, 0, 0, 0, 0
+    
 def instantaneous_phase(bands):
     for i,item in enumerate(bands):
         #First obtain the analytical signal with hilbert transformation. 
@@ -553,7 +574,7 @@ def process_channel_names(channel_names):
     
     channel_names = [(elem.split())[-1] for elem in channel_names]
     channel_names = [(elem.replace("-", " ").split())[0] for elem in channel_names]
-    print('Names:', channel_names)
+    print('Channel Names:', channel_names)
     
     return channel_names
 
