@@ -377,7 +377,6 @@ def calculate_conn(data_intervals, i, j, sample_rate, conn, channels):
     if conn == 'coh':
         f, Cxy = (signal.coherence(data_intervals[i], data_intervals[j], sample_rate))
         
-        print(f)
         delta, theta, alpha, beta, gamma = frequency_bands(f, Cxy)
         
         return delta.mean(), theta.mean(), alpha.mean(), beta.mean(), gamma.mean()
@@ -491,24 +490,39 @@ def calculate_conn(data_intervals, i, j, sample_rate, conn, channels):
         
         return pli
     
-    if conn == 'dtf':
-        if i!=j:
-            data = np.zeros(shape=(2, 2048))
-            data[0] = data_intervals[i]
-            data[1] = data_intervals[j]
 
-            ws = scot.Workspace({'model_order': channels}, nfft = int(sample_rate/2))
-            ws.set_data(data)
-            ws.do_mvarica()
-            ws.fit_var()
-            results = ws.get_connectivity('DTF')
-            f = np.arange(0, int(sample_rate/2))
-
-            delta, theta, alpha, beta, gamma = frequency_bands(f, results[1][0])
-
-            return delta.mean(), theta.mean(), alpha.mean(), beta.mean(), gamma.mean()
-        else:
-            return 0, 0, 0, 0, 0
+def calculate_dtf(data_intervals, steps, channels, sample_rate, bands):
+    num_bands = sum(bands)
+    intervals = (len(steps))
+    matrix = np.zeros(shape=((intervals * num_bands), channels, channels))
+    start, stop = 0, channels
+    
+    ws = scot.Workspace({'model_order': channels - 5}, reducedim = 'no_pca', nfft= int(sample_rate/2), fs = sample_rate)
+    
+    f = np.arange(0, int(sample_rate/2))
+    
+    #Loop over the number of intervals
+    for k in range(intervals):
+        #If there is more than one interval, the new start is the last stop and we calculate the new stop with the number of channels. 
+        if k!=0:
+            start = stop
+            stop+= channels
+            
+        ws.set_data(data_intervals[start:stop])
+        ws.do_mvarica()
+        ws.fit_var()
+        results = ws.get_connectivity('DTF')
+        #Loop over 
+        for x,i in enumerate(range(start, stop)):
+            for y,j in enumerate(range(start, stop)):
+                delta, theta, alpha, beta, gamma = frequency_bands(f, results[x][y])
+                r=0
+                for z, item in enumerate ([delta, theta, alpha, beta, gamma]):
+                    if bands[z]:
+                        matrix[(k * num_bands) + r][x,y] = item.mean()
+                        r+=1                  
+    return matrix
+    
     
 def instantaneous_phase(bands):
     for i,item in enumerate(bands):
@@ -552,12 +566,44 @@ def make_graph(matrix, ch_names, threshold):
     for k in range(num_graphs):
         #plt.figure(k, figsize=(12,12))
         #plt.title("--------------------------------\nGraph: " + str(k+1))
-        fig = draw_graph(G[k])
+        fig = draw_graph(G[k], False)
         fig.update_layout(title='', plot_bgcolor='white' ) 
         fig.write_html('plot' + str(k+1) + '.html', auto_open=True, default_height='100%', default_width='100%')
                    
     #plt.show()
     
+    
+def make_directed_graph(matrix, ch_names, threshold):
+    
+    #The number of graphs will be the number of correlation matrixes. 
+    num_graphs = len(matrix)
+    print("\nNumber of graphs created:", num_graphs)
+    #Uses the helper function "process_channel_names" to obtain the names of the electrodes, to be used as nodes
+    nodes = process_channel_names(ch_names)
+    
+    G = {}
+    num_nodes = len(nodes)
+    
+    #Loop over the number of graphs, creating the nx Graph, adding the nodes (which will be the same in all graphs) and adding an edge if the connectivity measure is above the threshold.
+    #Also we add a weight to the edge, to draw the edge´s size according to this value. It is the connectivity coefficient to a power, to really difference big from smaller coefficients. 
+    for k in range(num_graphs):
+        G[k] = nx.DiGraph()
+        G[k].add_nodes_from(nodes)
+        for i in range(num_nodes):
+            for j in range(num_nodes):
+                if matrix[k][i,j] > threshold and i!=j:
+                    #print("graph:",k,"Edge between:", i,j)
+                    G[k].add_edge(nodes[i],nodes[j], thickness = pow(matrix[k][i,j], 3) * 6, weight = matrix[k][i,j])
+    
+    #For each graph, we call the helper function "draw_graph". 
+    for k in range(num_graphs):
+        #plt.figure(k, figsize=(12,12))
+        #plt.title("--------------------------------\nGraph: " + str(k+1))
+        fig = draw_graph(G[k], True)
+        fig.update_layout(title='', plot_bgcolor='white' ) 
+        fig.write_html('plot' + str(k+1) + '.html', auto_open=True, default_height='100%', default_width='100%')
+        
+        
     
 def process_channel_names(channel_names):
     """Process to obtain the electrode name from the channel name.
@@ -579,7 +625,7 @@ def process_channel_names(channel_names):
     return channel_names
 
 
-def draw_graph(G):
+def draw_graph(G, directed):
     """Process to create the networkX graphs.
     Parameters
     ----------
@@ -698,6 +744,14 @@ def draw_graph(G):
                                                 method="restyle"
                                             )]))])
     
+    if directed:
+        for i,edge in enumerate(edges):
+            x0, y0 = G.nodes[edge[0]]['pos']
+            x1, y1 = G.nodes[edge[1]]['pos']
+            fig.add_annotation(
+                ax=x0, ay=y0, axref='x', ayref='y',x=x1, y=y1, xref='x', yref='y', showarrow=True, arrowhead=1, arrowsize=2, standoff = 22, startstandoff = 16, opacity= 0.8
+            )
+    
     return fig
     
     
@@ -731,7 +785,7 @@ def get_edge_trace(G):
         x=edge_x, y=edge_y,
         line=dict(width=width, color='#000'),
         mode='lines',
-        hoverinfo='skip'    
+        hoverinfo='skip',
         )
     
     edge_trace = list(edge_traces.values())
