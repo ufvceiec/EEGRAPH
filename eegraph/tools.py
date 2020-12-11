@@ -7,6 +7,7 @@ import plotly.graph_objects as go
 import scot
 from scipy import signal, stats
 from math import pow
+from itertools import combinations
 
 
     
@@ -522,6 +523,52 @@ def calculate_dtf(data_intervals, steps, channels, sample_rate, bands):
                         matrix[(k * num_bands) + r][x,y] = item.mean()
                         r+=1                  
     return matrix
+
+def calculate_visibility_graphs(data_intervals):
+    VG = {}
+    for i in range(len(data_intervals)):
+        VG[i] = visibility_graph(data_intervals[i])
+    
+    return VG
+
+def visibility_graph(series):
+
+    G = nx.Graph()
+    
+    # convert list of magnitudes into list of tuples that hold the index
+    tseries = []
+    n = 0
+    for magnitude in series:
+        tseries.append( (n, magnitude ) )
+        n += 1
+
+    # contiguous time points always have visibility
+    for n in range(0,len(tseries)-1):
+        (ta, ya) = tseries[n]
+        (tb, yb) = tseries[n+1]
+        G.add_node(ta, mag=ya)
+        G.add_node(tb, mag=yb)
+        G.add_edge(ta, tb)
+
+    for a,b in combinations(tseries, 2):
+        # two points, maybe connect
+        (ta, ya) = a
+        (tb, yb) = b
+
+        connect = True
+        
+        # let's see all other points in the series
+        for tc, yc in tseries[ta:tb]:
+            # other points, not a or b
+            if tc != ta and tc != tb:
+                # does c obstruct?
+                if yc > yb + (ya - yb) * ( (tb - tc) / (tb - ta) ):
+                    connect = False
+                    
+        if connect:
+            G.add_edge(ta, tb)
+
+    return G
     
     
 def instantaneous_phase(bands):
