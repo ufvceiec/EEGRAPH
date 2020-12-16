@@ -6,7 +6,7 @@ import networkx as nx
 import plotly.graph_objects as go
 import scot
 from scipy import signal, stats
-from math import pow
+from math import pow, exp, atan
 from itertools import combinations
 
 
@@ -490,7 +490,16 @@ def calculate_conn(data_intervals, i, j, sample_rate, conn, channels):
         pli = abs(np.mean(np.sign(phase_diff)))
         
         return pli
+
     
+def instantaneous_phase(bands):
+    for i,item in enumerate(bands):
+        #First obtain the analytical signal with hilbert transformation. 
+        bands[i] = signal.hilbert(item)
+        #The instantaneous phase can then simply be obtained as the angle between the real and imaginary part of the analytic signal
+        bands[i] = np.angle(bands[i])
+    return bands
+
 
 def calculate_dtf(data_intervals, steps, channels, sample_rate, bands):
     num_bands = sum(bands)
@@ -524,15 +533,15 @@ def calculate_dtf(data_intervals, steps, channels, sample_rate, bands):
                         r+=1                  
     return matrix
 
-def calculate_visibility_graphs(data_intervals):
+#Visibility Graph
+def calculate_visibility_graphs(data_intervals, kernel):
     VG = {}
     for i in range(len(data_intervals)):
-        VG[i] = visibility_graph(data_intervals[i])
+        VG[i] = visibility_graph(data_intervals[i], kernel)
     
     return VG
 
-def visibility_graph(series):
-
+def visibility_graph(series, kernel):
     G = nx.Graph()
     
     # convert list of magnitudes into list of tuples that hold the index
@@ -548,7 +557,9 @@ def visibility_graph(series):
         (tb, yb) = tseries[n+1]
         G.add_node(ta, mag=ya)
         G.add_node(tb, mag=yb)
-        G.add_edge(ta, tb)
+        
+        edge_weight = calculate_vg_weight(tseries, kernel, ta, tb, ya, yb)
+        G.add_edge(ta, tb, weight = edge_weight)
 
     for a,b in combinations(tseries, 2):
         # two points, maybe connect
@@ -566,18 +577,23 @@ def visibility_graph(series):
                     connect = False
                     
         if connect:
-            G.add_edge(ta, tb)
+            edge_weight = calculate_vg_weight(tseries, kernel, ta, tb, ya, yb)
+            G.add_edge(ta, tb, weight = edge_weight)
 
     return G
     
+def calculate_vg_weight(series, kernel, ta, tb, ya, yb):
+    if kernel == 'binary':
+        return 1
     
-def instantaneous_phase(bands):
-    for i,item in enumerate(bands):
-        #First obtain the analytical signal with hilbert transformation. 
-        bands[i] = signal.hilbert(item)
-        #The instantaneous phase can then simply be obtained as the angle between the real and imaginary part of the analytic signal
-        bands[i] = np.angle(bands[i])
-    return bands
+    #Mathur_2020
+    if kernel == 'gaussian':
+        std = np.std(series)
+        return exp(-((abs(ta-tb))**2)/ (2*(std)**2))
+    
+    #Supriya_2016
+    if kernel == 'weighted':
+        return atan((yb - ya)/(tb-ta))
 
         
 def make_graph(matrix, ch_names, threshold):
@@ -792,19 +808,29 @@ def draw_graph(G, directed):
                                             )]))])
     
     if directed:
+        edges_control = []
         for i,edge in enumerate(edges):
             x0, y0 = G.nodes[edge[0]]['pos']
             x1, y1 = G.nodes[edge[1]]['pos']
+            
+            #If there is another edge between the same nodes in the opposite direction
+            if edge in edges_control:
+                x0= x0 - 0.05
+                y0= y0 + 0.05
+                x1= x1 - 0.05
+                y1= y1 + 0.05
+                
             fig.add_annotation(
-                ax=x0, ay=y0, axref='x', ayref='y',x=x1, y=y1, xref='x', yref='y', showarrow=True, arrowhead=1, arrowsize=2, standoff = 22, startstandoff = 16, opacity= 0.8
+                ax=x0, ay=y0, axref='x', ayref='y',x=x1, y=y1, xref='x', yref='y', showarrow=True, arrowhead=1, arrowsize=2, standoff = 22, startstandoff = 15, opacity= 0.8
             )
-    
+            #We add the edge in the opposite direction to control edges between the same nodes
+            edges_control.append((edge[1],edge[0]))
     return fig
     
     
 def get_edge_trace(G):
     etext = [f'weight: {"{:.2f}".format(w)}' for w in list(nx.get_edge_attributes(G, 'weight').values())]
-    xtext, ytext = [], []
+    xtext, ytext, edges_control = [], [], []
     
     edges = G.edges()
     weights = [G[u][v]['weight'] for u,v in edges]
@@ -815,9 +841,17 @@ def get_edge_trace(G):
     for i, edge in enumerate (G.edges()):  
         edge_x = []
         edge_y = []
-
+        
         x0, y0 = G.nodes[edge[0]]['pos']
         x1, y1 = G.nodes[edge[1]]['pos']
+        
+        #If there is another edge between the same nodes in the opposite direction
+        if edge in edges_control:
+            x0= x0 - 0.05
+            y0= y0 + 0.05
+            x1= x1 - 0.05
+            y1= y1 + 0.05
+
         xtext.append((x0+x1)/2)
         ytext.append((y0+y1)/2)
         edge_x.append(x0)
@@ -827,6 +861,9 @@ def get_edge_trace(G):
         edge_y.append(y1)
         edge_y.append(None)
         width = thickness[i]
+
+        #We add the edge in the opposite direction to control edges between the same nodes
+        edges_control.append((edge[1],edge[0]))
         
         edge_traces['trace_' + str(i)] = go.Scatter(
         x=edge_x, y=edge_y,

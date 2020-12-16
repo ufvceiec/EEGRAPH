@@ -151,11 +151,13 @@ def dtf(path, window_size, bands, exclude = [None], threshold = 0.3):
     make_directed_graph(connectivity_matrix, ch_names,  threshold)
     
     
-def vg(path, window_size, exclude = [None], threshold = 0.3):
+def vg(path, window_size, exclude = [None], threshold = 0.3, kernel= 'binary'):
+    
     data = input_data_type(path, exclude)
     
     raw_data, num_channels, sample_rate, sample_duration, ch_names = get_display_info(data)
     
     data_intervals, steps = time_intervals(raw_data, sample_rate, sample_duration, window_size)
     
-    visibility_grahps = calculate_visibility_graphs(data_intervals)
+    visibility_grahps = calculate_visibility_graphs(data_intervals, kernel)
+    
