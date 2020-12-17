@@ -161,3 +161,52 @@ def vg(path, window_size, exclude = [None], threshold = 0.3, kernel= 'binary'):
     
     visibility_grahps = calculate_visibility_graphs(data_intervals, kernel)
     
+    
+
+def power_spectrum(path, window_size, bands, exclude = [None], threshold = 0.3):
+    
+    conn = 'ps'
+    
+    data = input_data_type(path, exclude)
+    
+    raw_data, num_channels, sample_rate, sample_duration, ch_names = get_display_info(data)
+    
+    wanted_bands = input_bands(bands)
+    
+    data_intervals, steps = time_intervals(raw_data, sample_rate, sample_duration, window_size)
+    
+    connectivity_matrix = calculate_connectivity_single_channel_with_bands(data_intervals, sample_rate, conn, wanted_bands)
+    
+    single_channel_graph(connectivity_matrix, ch_names, num_channels, threshold, wanted_bands)
+    
+    
+def spectral_entropy(path, window_size, bands, exclude = [None], threshold = 0.75):
+    
+    conn = 'se'
+    
+    data = input_data_type(path, exclude)
+    
+    raw_data, num_channels, sample_rate, sample_duration, ch_names = get_display_info(data)
+    
+    wanted_bands = input_bands(bands)
+    
+    data_intervals, steps = time_intervals(raw_data, sample_rate, sample_duration, window_size)
+    
+    connectivity_matrix = calculate_connectivity_single_channel_with_bands(data_intervals, sample_rate, conn, wanted_bands)
+    
+    single_channel_graph(connectivity_matrix, ch_names, num_channels, threshold, wanted_bands)
+    
+    
+def shannon_entropy(path, window_size, exclude = [None], threshold = 6.4):
+    
+    conn = 'she'
+    
+    data = input_data_type(path, exclude)
+    
+    raw_data, num_channels, sample_rate, sample_duration, ch_names = get_display_info(data)
+    
+    data_intervals, steps = time_intervals(raw_data, sample_rate, sample_duration, window_size)
+    
+    connectivity_matrix = calculate_connectivity_single_channel(data_intervals, sample_rate, conn)
+    
+    single_channel_graph(connectivity_matrix, ch_names, num_channels, threshold)
