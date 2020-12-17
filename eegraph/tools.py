@@ -6,9 +6,11 @@ import networkx as nx
 import plotly.graph_objects as go
 import scot
 from scipy import signal, stats
+from scipy.stats import entropy
 from math import pow, exp, atan
 from itertools import combinations
-
+#https://raphaelvallat.com/entropy/build/html/index.html
+from entropy import spectral_entropy
 
     
 def input_data_type(path, exclude):
@@ -533,6 +535,76 @@ def calculate_dtf(data_intervals, steps, channels, sample_rate, bands):
                         r+=1                  
     return matrix
 
+def calculate_connectivity_single_channel(data_intervals, sample_rate, conn):
+    values = []
+    
+    for i in range (len(data_intervals)):
+        values.append(single_channel_connectivity(data_intervals[i], sample_rate, conn))
+    
+    return values
+
+
+def calculate_connectivity_single_channel_with_bands(data_intervals, sample_rate, conn, bands):
+    values = []
+    num_bands = sum(bands)
+    
+    for i in range (len(data_intervals)):
+        delta, theta, alpha, beta, gamma = calculate_bands_fft(data_intervals[i], sample_rate)
+        
+        for z,item in enumerate([delta, theta, alpha, beta, gamma]):
+            if bands[z]:
+                values.append(single_channel_connectivity(item, sample_rate, conn))
+    
+    return values
+
+
+def single_channel_connectivity(data, sample_rate, conn):
+    #Power Spectrum
+    #https://www.kite.com/python/answers/how-to-plot-a-power-spectrum-in-python
+    if conn == 'ps':
+        fourier_transform = np.fft.rfft(data)
+        abs_fourier_transform = np.abs(fourier_transform)
+        power_spectrum = np.square(abs_fourier_transform)
+        return power_spectrum.mean()
+       
+    #Spectral Entropy
+    #https://raphaelvallat.com/entropy/build/html/index.html
+    if conn == 'se':
+        se = spectral_entropy(data, sample_rate, method='welch', normalize=True)
+        return se
+    
+    #Shannon Entropy
+    #https://www.kite.com/python/answers/how-to-calculate-shannon-entropy-in-python
+    if conn == 'she':
+        pd_series = pd.Series(data)
+        counts = pd_series.value_counts()
+        she = entropy(counts)
+        return she
+
+def single_channel_graph(data, ch_names, channels, threshold, bands=None):     
+    num_graphs = int(len(data)/channels)
+    print("\nNumber of graphs created:", num_graphs)
+    nodes = process_channel_names(ch_names)
+    
+    G = {}
+    for i in range(num_graphs):
+        G[i] = nx.Graph()
+        G[i].add_nodes_from(nodes)
+        elegible_nodes = []
+        for j in range(channels):
+            if(data[(channels * i) + j]) > threshold:
+                elegible_nodes.append(nodes[j])
+        edges = combinations(elegible_nodes,2)        
+        G[i].add_edges_from(edges, weight = 1, thickness=1)
+        
+     #For each graph, we call the helper function "draw_graph". 
+    for k in range(num_graphs):
+        #plt.figure(k, figsize=(12,12))
+        #plt.title("--------------------------------\nGraph: " + str(k+1))
+        fig = draw_graph(G[k], False)
+        fig.update_layout(title='', plot_bgcolor='white' ) 
+        fig.write_html('plot' + str(k+1) + '.html', auto_open=True, default_height='100%', default_width='100%')
+
 #Visibility Graph
 def calculate_visibility_graphs(data_intervals, kernel):
     VG = {}
@@ -633,7 +705,6 @@ def make_graph(matrix, ch_names, threshold):
         fig.update_layout(title='', plot_bgcolor='white' ) 
         fig.write_html('plot' + str(k+1) + '.html', auto_open=True, default_height='100%', default_width='100%')
                    
-    #plt.show()
     
     
 def make_directed_graph(matrix, ch_names, threshold):
