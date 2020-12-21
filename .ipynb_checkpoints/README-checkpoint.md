@@ -60,7 +60,23 @@ To install the latest stable version of EEGraph, you can use pip in a terminal:
 pip install -U eegraph
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
+## Functions
+
+### Importing EEG data 
+The different supported EEG file formats by EEGraph.
+
+#### File format | Extension
+* Brainvision | .vhdr
+* Neuroscan CNT  | .cnt
+* European data format | .edf
+* Biosemi data format | .bdf
+* General data format | .gdf
+* EGI simple binary | .egi
+* EGI MFF format | .mff
+* eXimia | .nxe
+
+
+### Connectivity Measures
 
 ## Usage
 ```python
