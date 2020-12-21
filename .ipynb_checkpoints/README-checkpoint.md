@@ -13,31 +13,43 @@ These instructions will get you a copy of the project up and running on your loc
 What things you need to install the software and how to install them
 
 * Numpy
-* Pandas
-* Mne
-* Matplotlib
-* NetworkX
-* Plotly
-* Scipy
-* Math
-* Itertools
-* Entropy
-* Scot
-
 ```python
-import numpy as np
-
-import pandas as pd
-
-import mne
-
-import matplotlib.pyplot as plt
-
-import networkx as nx
-
-import plotly.graph_objects as go
-
-import scot
+pip install numpy
+```
+* Pandas
+```python
+pip install pandas
+```
+* Mne
+```python
+pip install -U mne
+```
+* Matplotlib
+```python
+pip install matplotlib
+```
+* NetworkX
+```python
+pip install networkx
+```
+* Plotly
+```python
+pip install plotly
+```
+* Scipy
+```python
+pip install scipy
+```
+* Entropy
+```python
+git clone https://github.com/raphaelvallat/entropy.git entropy/
+cd entropy/
+pip install -r requirements.txt
+python setup.py develop
+```
+* Scot
+```python
+pip install scot
 ```
 
 ### Installing EEGraph
