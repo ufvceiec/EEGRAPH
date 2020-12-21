@@ -65,7 +65,7 @@ pip install -U eegraph
 ### Importing EEG data 
 The different supported EEG file formats by EEGraph.
 
-#### File format | Extension
+#####         File format | Extension
 * Brainvision | .vhdr
 * Neuroscan CNT  | .cnt
 * European data format | .edf
