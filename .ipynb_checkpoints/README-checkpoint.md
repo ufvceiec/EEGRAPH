@@ -1,7 +1,7 @@
 # EEGraph
 
-EEGraph is a Python library to model electroencephalograms (EEGs) as graphs so the connectivity between different brain areas could be analyzed. It has applications
-in the study of neurologic diseases like Parkinson or epilepsy.
+EEGraph is a Python library to model electroencephalograms (EEGs) as graphs, so the connectivity between different brain areas could be analyzed. It has applications
+in the study of neurologic diseases like Parkinson or epilepsy. The graph can be exported as a NetworkX graph-like object and it can also be visualized. 
 
 ## Getting Started
 
@@ -15,20 +15,12 @@ What things you need to install the software and how to install them
 Give examples
 ```
 
-### Installing
+### Installing EEGraph
 
-A step by step series of examples that tell you how to get a development env running
-
-Say what the step will be
+To install the latest stable version of EEGraph, you can use pip in a terminal:
 
 ```
-Give the example
-```
-
-And repeat
-
-```
-until finished
+pip install -U EEgraph
 ```
 
 End with an example of getting some data out of the system or using it for a little demo
