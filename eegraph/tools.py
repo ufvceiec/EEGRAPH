@@ -31,11 +31,24 @@ def input_data_type(path, exclude):
     #Split the path in two parts, left and right of the dot. 
     file_type = path.split(".")
     
+    #https://mne.tools/0.17/manual/io.html
     #Check the extension of the file, and read it accordingly. 
     if(file_type[-1] == 'edf'):
         data = mne.io.read_raw_edf(path, exclude= exclude)
     elif(file_type[-1] == 'gdf'):
         data = mne.io.read_raw_gdf(path, exclude= exclude)
+    elif(file_type[-1] == 'vhdr'):
+        data = mne.io.read_raw_brainvision(path, exclude= exclude)
+    elif(file_type[-1] == 'cnt'):
+        data = mne.io.read_raw_cnt(path, exclude= exclude)   
+    elif(file_type[-1] == 'bdf'):
+        data = mne.io.read_raw_edf(path, exclude= exclude)
+    elif(file_type[-1] == 'egi'):
+        data = mne.io.read_raw_egi(path, exclude= exclude)
+    elif(file_type[-1] == 'mff'):
+        data = mne.io.read_raw_egi(path, exclude= exclude)
+    elif(file_type[-1] == 'nxe'):
+        data = mne.io.read_raw_eximia(path, exclude= exclude)
         
     return data
 
