@@ -24,7 +24,7 @@ What things you need to install the software and how to install them
 * Entropy
 * Scot
 
-```
+```python
 import numpy as np
 
 import pandas as pd
@@ -44,7 +44,7 @@ import scot
 
 To install the latest stable version of EEGraph, you can use pip in a terminal:
 
-```
+```python
 pip install -U EEgraph
 ```
 
