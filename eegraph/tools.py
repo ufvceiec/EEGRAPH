@@ -554,7 +554,7 @@ def calculate_connectivity_single_channel_with_bands(data_intervals, sample_rate
         for z,item in enumerate([delta, theta, alpha, beta, gamma]):
             if bands[z]:
                 values.append(single_channel_connectivity(item, sample_rate, conn))
-    
+                
     return values
 
 
@@ -581,7 +581,7 @@ def single_channel_connectivity(data, sample_rate, conn):
         she = entropy(counts)
         return she
 
-def single_channel_graph(data, ch_names, channels, threshold, bands=None):     
+def single_channel_graph(data, ch_names, channels, bands=None):     
     num_graphs = int(len(data)/channels)
     print("\nNumber of graphs created:", num_graphs)
     nodes = process_channel_names(ch_names)
@@ -589,8 +589,12 @@ def single_channel_graph(data, ch_names, channels, threshold, bands=None):
     G = {}
     for i in range(num_graphs):
         G[i] = nx.Graph()
-        G[i].add_nodes_from(nodes)
+        G[i].add_nodes_from(nodes, values=5)
         elegible_nodes = []
+        
+        #Calculate the 75th percentile of the channels
+        threshold = np.percentile(data[(i*channels):(((i+1)*channels)-1)], 75)
+
         for j in range(channels):
             if(data[(channels * i) + j]) > threshold:
                 elegible_nodes.append(nodes[j])
@@ -601,7 +605,7 @@ def single_channel_graph(data, ch_names, channels, threshold, bands=None):
     for k in range(num_graphs):
         #plt.figure(k, figsize=(12,12))
         #plt.title("--------------------------------\nGraph: " + str(k+1))
-        fig = draw_graph(G[k], False)
+        fig = draw_graph(G[k], False, True)
         fig.update_layout(title='', plot_bgcolor='white' ) 
         fig.write_html('plot' + str(k+1) + '.html', auto_open=True, default_height='100%', default_width='100%')
 
@@ -701,7 +705,7 @@ def make_graph(matrix, ch_names, threshold):
     for k in range(num_graphs):
         #plt.figure(k, figsize=(12,12))
         #plt.title("--------------------------------\nGraph: " + str(k+1))
-        fig = draw_graph(G[k], False)
+        fig = draw_graph(G[k], False, False)
         fig.update_layout(title='', plot_bgcolor='white' ) 
         fig.write_html('plot' + str(k+1) + '.html', auto_open=True, default_height='100%', default_width='100%')
                    
@@ -733,7 +737,7 @@ def make_directed_graph(matrix, ch_names, threshold):
     for k in range(num_graphs):
         #plt.figure(k, figsize=(12,12))
         #plt.title("--------------------------------\nGraph: " + str(k+1))
-        fig = draw_graph(G[k], True)
+        fig = draw_graph(G[k], True, False)
         fig.update_layout(title='', plot_bgcolor='white' ) 
         fig.write_html('plot' + str(k+1) + '.html', auto_open=True, default_height='100%', default_width='100%')
         
@@ -759,7 +763,7 @@ def process_channel_names(channel_names):
     return channel_names
 
 
-def draw_graph(G, directed):
+def draw_graph(G, directed, hover_nodes):
     """Process to create the networkX graphs.
     Parameters
     ----------
