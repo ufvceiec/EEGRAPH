@@ -10,7 +10,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
+What things you need to install the software and how to install them.
 
 * Numpy
 ```python
@@ -57,7 +57,7 @@ pip install scot
 To install the latest stable version of EEGraph, you can use pip in a terminal:
 
 ```python
-pip install -U EEgraph
+pip install -U eegraph
 ```
 
 End with an example of getting some data out of the system or using it for a little demo
