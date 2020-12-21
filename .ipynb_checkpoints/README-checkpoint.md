@@ -3,16 +3,41 @@
 EEGraph is a Python library to model electroencephalograms (EEGs) as graphs, so the connectivity between different brain areas could be analyzed. It has applications
 in the study of neurologic diseases like Parkinson or epilepsy. The graph can be exported as a NetworkX graph-like object and it can also be visualized. 
 
+
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisites
 
 What things you need to install the software and how to install them
 
+* Numpy
+* Pandas
+* Mne
+* Matplotlib
+* NetworkX
+* Plotly
+* Scipy
+* Math
+* Itertools
+* Entropy
+* Scot
+
 ```
-Give examples
+import numpy as np
+
+import pandas as pd
+
+import mne
+
+import matplotlib.pyplot as plt
+
+import networkx as nx
+
+import plotly.graph_objects as go
+
+import scot
 ```
 
 ### Installing EEGraph
