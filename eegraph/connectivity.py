@@ -96,7 +96,7 @@ def wpli(path, window_size, bands, exclude = [None], threshold = 0.45):
     make_graph(connectivity_matrix, ch_names,  threshold)
     
     
-def plv(path, window_size, bands, exclude = [None], threshold = 0.83):
+def plv(path, window_size, bands, exclude = [None], threshold = 0.80):
     conn = 'plv'
     
     data = input_data_type(path, exclude)
