@@ -5,4 +5,5 @@ matplotlib
 networkx
 plotly
 scipy
-math
+entropy
+scot
