@@ -99,7 +99,7 @@ eegraph.connectivity.pearson_correlation(path="espasmo1.edf", window_size = 2, e
 ```
 
 Graphic Output Example. 
-![Connectivity Graph Output Example](demo/eegragh_output.gif)
+![Connectivity Graph Output Example](https://github.com/ufvceiec/EEGRAPH/blob/develop/demo/eegraph_output.gif)
 
 ## Deployment
 
