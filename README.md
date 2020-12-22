@@ -98,18 +98,14 @@ import eegraph
 eegraph.connectivity.pearson_correlation(path="espasmo1.edf", window_size = 2, exclude = ['EEG TAntI1-TAntI', 'EEG TAntD1-TAntD'])
 ```
 
-Graphic Output Example. 
+
+### Graph Visualization Example
+
 ![Connectivity Graph Output Example](https://github.com/ufvceiec/EEGRAPH/blob/develop/demo/eegraph_output.gif)
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
-
-## Built With
 
 
 ## Versioning
-Se [CHANGELOG.txt](CHANGELOG.txt) for major/breaking updates and version history.
+See [CHANGELOG.txt](CHANGELOG.txt) for major/breaking updates and version history.
 
 
 ## Authors
@@ -122,6 +118,8 @@ This project is licensed under the [MIT](https://choosealicense.com/licenses/mit
 
 ## Acknowledgments
 
-* Hat tip to anyone whose code was used
+
+
+
 
 
