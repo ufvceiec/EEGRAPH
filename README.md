@@ -19,6 +19,16 @@ What libraries you need to install.
 * Plotly
 * Scipy
 * Scot
+```python
+pip install numpy
+pip install pandas
+pip install mne
+pip install matplotlib
+pip install networkx
+pip install plotly
+pip install scipy
+pip install scot
+```
 * Entropy
 ```python
 git clone https://github.com/raphaelvallat/entropy.git entropy/
