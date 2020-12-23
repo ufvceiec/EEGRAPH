@@ -97,7 +97,7 @@ _list_: The specific time intervals in seconds, e.g.[0, 3, 8]. The time interval
 
 ![Connectivity Graph Output Example](https://github.com/ufvceiec/EEGRAPH/blob/develop/demo/eegraph_output.gif)
 
-### EEGraph Workflow
+## EEGraph Workflow
 ![EEGraph Workflow Example](https://github.com/ufvceiec/EEGRAPH/blob/develop/demo/eegraph_workflow.png)
 
 ## Versioning
