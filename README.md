@@ -92,22 +92,23 @@ eegraph.connectivity.pearson_correlation(path="espasmo1.edf", window_size = 2, e
 
 ![Connectivity Graph Output Example](https://github.com/ufvceiec/EEGRAPH/blob/develop/demo/eegraph_output.gif)
 
+### Workflow
+![EEGraph Workflow Example](https://github.com/ufvceiec/EEGRAPH/blob/develop/demo/eegraph_workflow.png)
 
 ## Versioning
 See [CHANGELOG.txt](CHANGELOG.txt) for major/breaking updates and version history.
 
 
-## Authors
-Centro de Estudios e Innovación en Gestión del Conocimiento (CEIEC), Universidad Francisco de Vitoria. 
 
 ## Contact
-
+Centro de Estudios e Innovación en Gestión del Conocimiento (CEIEC), Universidad Francisco de Vitoria.
+* Responsible: Alberto Nogales (alberto.nogales@ceiec.es)
+* Supervisor: Ana María Maitín
+* Main developer: Pedro Chazarra
 
 ## License
 
 This project is licensed under the [MIT](https://choosealicense.com/licenses/mit/) License.
-
-## Acknowledgments
 
 
 
