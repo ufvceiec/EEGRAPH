@@ -87,18 +87,15 @@ import eegraph
 eegraph.connectivity.pearson_correlation(path="espasmo1.edf", window_size = 2, exclude = ['EEG TAntI1-TAntI', 'EEG TAntD1-TAntD'])
 ```
 
-
 ### Graph Visualization Example
 
 ![Connectivity Graph Output Example](https://github.com/ufvceiec/EEGRAPH/blob/develop/demo/eegraph_output.gif)
 
-### Workflow
+### EEGraph Workflow
 ![EEGraph Workflow Example](https://github.com/ufvceiec/EEGRAPH/blob/develop/demo/eegraph_workflow.png)
 
 ## Versioning
 See [CHANGELOG.txt](CHANGELOG.txt) for major/breaking updates and version history.
-
-
 
 ## Contact
 Centro de Estudios e Innovación en Gestión del Conocimiento (CEIEC), Universidad Francisco de Vitoria.
