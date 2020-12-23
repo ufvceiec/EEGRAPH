@@ -91,7 +91,7 @@ The window size can be defined as an _int_ or _list_.
 
 _int_: The set window size in seconds, e.g.(2). All the time intervals will be 2 seconds long.
 
-_list_: The specefic time intervals in seconds, e.g.[0, 3, 8]. The time intervalls will be the same as specified in the input. 
+_list_: The specific time intervals in seconds, e.g.[0, 3, 8]. The time intervalls will be the same as specified in the input. 
 
 ### Graph Visualization Example
 
