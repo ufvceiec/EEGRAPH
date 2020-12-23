@@ -86,6 +86,12 @@ Example usage of the library with Pearson Correlation.
 import eegraph
 eegraph.connectivity.pearson_correlation(path="espasmo1.edf", window_size = 2, exclude = ['EEG TAntI1-TAntI', 'EEG TAntD1-TAntD'])
 ```
+### Window size
+The window size can be defined as an _int_ or _list_. 
+
+_int_: The set window size in seconds, e.g.(2). All the time intervals will be 2 seconds long.
+
+_list_: The specefic time intervals in seconds, e.g.[0, 3, 8]. The time intervalls will be the same as specified in the input. 
 
 ### Graph Visualization Example
 
