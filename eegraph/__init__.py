@@ -1,1 +1,1 @@
-from .connectivity import *
+from .graph import *

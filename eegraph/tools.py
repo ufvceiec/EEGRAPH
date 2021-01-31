@@ -1,130 +1,57 @@
 import numpy as np
 import pandas as pd
-import mne
-import matplotlib.pyplot as plt
+import scot
+from scipy import signal
 import networkx as nx
 import plotly.graph_objects as go
-import scot
-from scipy import signal, stats
-from scipy.stats import entropy
-from math import pow, exp, atan
-from itertools import combinations
-#https://raphaelvallat.com/entropy/build/html/index.html
-from entropy import spectral_entropy
 
-    
-def input_data_type(path, exclude):
-    """Process to identify the input extension, and extract it with mne EEG reader.
-    Parameters
-    ----------
-    path : string
-        Path to the EEG file.
-    exclude : list of strings
-        Channels names to exclude from the EEG.
+connectivity_measures = {'cross_correlation': 'Cross_correlation_Estimator', 'pearson_correlation': 'Pearson_correlation_Estimator', 'squared_coherence': 'Squared_coherence_Estimator',
+                         'imag_coherence': 'Imag_coherence_Estimator', 'corr_cross_correlation': 'Corr_cross_correlation_Estimator', 'wpli': 'Wpli_Estimator', 
+                         'plv': 'Plv_Estimator', 'pli': 'Pli_No_Bands_Estimator', 'pli_bands': 'Pli_Bands_Estimator', 'dtf': 'Dtf_Estimator', 'power_spectrum': 'Power_spectrum_Estimator',
+                         'spectral_entropy': 'Spectral_entropy_Estimator', 'shannon_entropy': 'Shannon_entropy_Estimator'}
+
+def search(values, searchFor):
+    for k in values:
+        if (searchFor == k):
+            return (values[k] + '()')
+    raise NameError('Connectivity Measure ' + "'" + searchFor + "'" + ' does not exist.')
+
+def need_bands(bands):
+    if (bands == [None]):
+        raise NameError("Connectivity Measure requires frequency bands to be specified.")
         
-    Returns
-    -------
-    data : mne.io.Raw
-        Processed EEG data file generated using mne.read, which can be used to extract all the information.
-    """
-    
-    #Split the path in two parts, left and right of the dot. 
-    file_type = path.split(".")
-    
-    #https://mne.tools/0.17/manual/io.html
-    #Check the extension of the file, and read it accordingly. 
-    if(file_type[-1] == 'edf'):
-        data = mne.io.read_raw_edf(path, exclude= exclude)
-    elif(file_type[-1] == 'gdf'):
-        data = mne.io.read_raw_gdf(path, exclude= exclude)
-    elif(file_type[-1] == 'vhdr'):
-        data = mne.io.read_raw_brainvision(path, exclude= exclude)
-    elif(file_type[-1] == 'cnt'):
-        data = mne.io.read_raw_cnt(path, exclude= exclude)   
-    elif(file_type[-1] == 'bdf'):
-        data = mne.io.read_raw_edf(path, exclude= exclude)
-    elif(file_type[-1] == 'egi'):
-        data = mne.io.read_raw_egi(path, exclude= exclude)
-    elif(file_type[-1] == 'mff'):
-        data = mne.io.read_raw_egi(path, exclude= exclude)
-    elif(file_type[-1] == 'nxe'):
-        data = mne.io.read_raw_eximia(path, exclude= exclude)
         
-    return data
-
-
-def get_display_info(data):
-    """Process to extract the data from the mne.io.Raw file and display it.
-    Parameters
-    ----------
-    data : mne.io.Raw
-        Processed EEG data file generated using mne.read. 
+def dont_need_bands(bands):
+    if (bands != [None]):
+        raise NameError("Connectivity Measure does not require frequency bands.")
         
-    Returns
-    -------
-    raw_data : array
-        Raw EEG signal; each row is one EEG channel, each column is data point.
-    num_channels: int
-        Number of channels in the EEG.
-    sample_rate: float
-        Sample frequency used in the EEG (Hz).
-    sample_duration: float
-        Duration of the EEG (seconds).
-    ch_names: list of strings
-        Channel names in the EEG.
-    """
-    
-    #Extract the raw_data and info with mne methods. 
-    raw_data = data.get_data()
-    info = data.info
-    
-    #Obtain different variables from the data. 
-    ch_names = data.ch_names
-    num_channels = info['nchan']
-    print("\nNumber of Channels:", num_channels)
-    sample_rate = info['sfreq']
-    print("Sample rate:", sample_rate, "Hz")
-    sample_duration = data.times.max()
-    print("Duration:", sample_duration, "seconds")
-    
-    return raw_data, num_channels, sample_rate, sample_duration, ch_names
-
-
 def re_scaling(raw_data):
     df = pd.DataFrame(raw_data)
     df.sub(df.mean(axis=1), axis=0)
     scaled_data = df.to_numpy()
 
     return scaled_data
-
-def input_bands(bands):
-    """Process to identify which bands does the user want to use.
+        
+def process_channel_names(channel_names):
+    """Process to obtain the electrode name from the channel name.
     Parameters
     ----------
-    bands : string
-        String with the bands to use, separated by commas. 
-        
+    channel_names : list
+        Channel names in the EEG.
+    
     Returns
     -------
-    wanted_bands : list
-        Boolean list, with 5 positions one for each frequency band.
+    channel_names : list
+        Proccessed channel names, containing only the name of the electrode.
     """
     
-    #Frequency bands.
-    freq_bands = ['delta', 'theta', 'alpha', 'beta', 'gamma']
-    wanted_bands = []
+    channel_names = [(elem.split())[-1] for elem in channel_names]
+    channel_names = [(elem.replace("-", " ").split())[0] for elem in channel_names]
     
-    #Loop over all frequency bands, and append True if it is in the input bands, otherwise append False. 
-    for elem in freq_bands:
-        if elem in bands:
-            wanted_bands.append(True)
-        else:
-            wanted_bands.append(False)
-
-    return wanted_bands
+    return channel_names
 
 
-def time_intervals(data, sample_rate, sample_duration, seconds):
+def calculate_time_intervals(data, sample_rate, sample_duration, seconds, sample_length):
     """Process to split the data based on the window size or time intervals.
     Parameters
     ----------
@@ -144,9 +71,6 @@ def time_intervals(data, sample_rate, sample_duration, seconds):
     steps : list
         List with the intervals, pairs of (Start, End) values in data points (seconds x sample frequency).
     """
-    
-    #Calculate the sample length in data points. 
-    sample_length = sample_rate * sample_duration
     epochs = []
     
     #Obtain the steps using the time_stamps helper function. 
@@ -161,8 +85,7 @@ def time_intervals(data, sample_rate, sample_duration, seconds):
             epochs.append(snippet)
     
     return np.array(epochs), steps
-
-
+                
 def time_stamps(seconds, sample_rate, sample_length, sample_duration):
     """Process to calculate the intervals based on the window size or time intervals.
     Parameters
@@ -228,6 +151,34 @@ def time_stamps(seconds, sample_rate, sample_length, sample_duration):
     print("Intervals: ",intervals)
     return intervals
 
+def input_bands(bands):
+    """Process to identify which bands does the user want to use.
+    Parameters
+    ----------
+    bands : string
+        String with the bands to use, separated by commas. 
+        
+    Returns
+    -------
+    wanted_bands : list
+        Boolean list, with 5 positions one for each frequency band.
+    """
+    need_bands(bands)
+    
+    
+    #Frequency bands.
+    freq_bands = ['delta', 'theta', 'alpha', 'beta', 'gamma']
+    wanted_bands = []
+    
+    #Loop over all frequency bands, and append True if it is in the input bands, otherwise append False. 
+    for elem in freq_bands:
+        if elem in bands:
+            wanted_bands.append(True)
+        else:
+            wanted_bands.append(False)
+
+    print('Frequency Bands:', freq_bands, wanted_bands)
+    return wanted_bands
 
 def calculate_bands_fft(values, sample_rate):
     """Process to calculate the numpy fft for the snippets.
@@ -299,9 +250,8 @@ def frequency_bands(f,Y):
 
     return delta, theta, alpha, beta, gamma
 
-
-def calculate_connectivity(data_intervals, steps, channels, sample_rate, conn):
-    """Process to calulate the correlation matrix, using cross correlation.
+def calculate_connectivity(data_intervals, steps, channels, sample_rate, connectivity):
+    """Process to calulate the correlation matrix.
     Parameters
     ----------
     data_intervals : array
@@ -330,12 +280,11 @@ def calculate_connectivity(data_intervals, steps, channels, sample_rate, conn):
         #Loop over all possible pairs of channels in the interval calculating the cross correlation coefficient and saving it in the correlation matrix. 
         for x,i in enumerate(range(start, stop)):
             for y,j in enumerate(range(start, stop)):
-                matrix[k][x,y] = calculate_conn(data_intervals, i, j, sample_rate, conn, channels)
+                matrix[k][x,y] = connectivity.calculate_conn(data_intervals, i, j, sample_rate, channels)
 
     return matrix
 
-
-def calculate_connectivity_with_bands(data_intervals, steps, channels, sample_rate, conn, bands):
+def calculate_connectivity_with_bands(data_intervals, steps, channels, sample_rate, connectivity, bands):
     #Calculate the number of bands, number of intervals and create the matrix. 
     num_bands = sum(bands)
     intervals = (len(steps))
@@ -351,7 +300,7 @@ def calculate_connectivity_with_bands(data_intervals, steps, channels, sample_ra
         #Loop over 
         for x,i in enumerate(range(start, stop)):
             for y,j in enumerate(range(start, stop)):
-                delta, theta, alpha, beta, gamma = calculate_conn(data_intervals, i, j, sample_rate, conn, channels)
+                delta, theta, alpha, beta, gamma = connectivity.calculate_conn(data_intervals, i, j, sample_rate, channels)
                 r=0
                 for z, item in enumerate ([delta, theta, alpha, beta, gamma]):
                     if bands[z]:
@@ -361,152 +310,6 @@ def calculate_connectivity_with_bands(data_intervals, steps, channels, sample_ra
     return matrix
 
 
-def calculate_conn(data_intervals, i, j, sample_rate, conn, channels):
-    if conn == 'cc':
-        x = data_intervals[i]
-        y = data_intervals[j]
-        
-        Rxy = signal.correlate(x,y, 'full')
-        Rxx = signal.correlate(x,x, 'full')
-        Ryy = signal.correlate(y,y, 'full')
-        
-        lags = np.arange(-len(data_intervals[i]) + 1, len(data_intervals[i]))
-        lag_0 = int((np.where(lags==0))[0])
-
-        Rxx_0 = Rxx[lag_0]
-        Ryy_0 = Ryy[lag_0]
-        
-        Rxy_norm = (1/(np.sqrt(Rxx_0*Ryy_0)))* Rxy
-        
-        #We use the mean from lag 0 to a 10% displacement. 
-        disp = round((len(data_intervals[i])) * 0.10)
-
-        cc_coef = Rxy_norm[lag_0: lag_0 + disp].mean()
-        
-        return cc_coef
-    
-    if conn == 'pearson':
-        r, p_value = (stats.pearsonr(data_intervals[i],data_intervals[j]))
-        
-        return r
-    
-    if conn == 'coh':
-        f, Cxy = (signal.coherence(data_intervals[i], data_intervals[j], sample_rate))
-        
-        delta, theta, alpha, beta, gamma = frequency_bands(f, Cxy)
-        
-        return delta.mean(), theta.mean(), alpha.mean(), beta.mean(), gamma.mean()
-    
-    if conn == 'icoh':
-        _, Pxx = signal.welch(data_intervals[i], fs=sample_rate)
-        _, Pyy = signal.welch(data_intervals[j], fs=sample_rate)
-        f, Pxy = signal.csd(data_intervals[i],data_intervals[j],fs=sample_rate)
-        icoh = np.imag(Pxy)/(np.sqrt(Pxx*Pyy))
-        
-        delta, theta, alpha, beta, gamma = frequency_bands(f, icoh)
-        
-        return delta.mean(), theta.mean(), alpha.mean(), beta.mean(), gamma.mean()
-    
-    if conn == 'corcc':
-        x = data_intervals[i]
-        y = data_intervals[j]
-        
-        Rxy = signal.correlate(x,y, 'full')
-        Rxx = signal.correlate(x,x, 'full')
-        Ryy = signal.correlate(y,y, 'full')
-        
-        lags = np.arange(-len(data_intervals[i]) + 1, len(data_intervals[i]))
-        lag_0 = int((np.where(lags==0))[0])
-
-        Rxx_0 = Rxx[lag_0]
-        Ryy_0 = Ryy[lag_0]
-        
-        Rxy_norm = (1/(np.sqrt(Rxx_0*Ryy_0)))* Rxy
-        negative_lag = Rxy_norm[:lag_0]
-        positive_lag = Rxy_norm[lag_0 + 1:]
-        
-        corCC = positive_lag - negative_lag
-        
-        disp = round((len(data_intervals[i])) * 0.15)
-        
-        corCC_coef = corCC[:disp].mean()
-        
-        return corCC_coef
-    
-    if conn == 'wpli':
-        f, Pxy = signal.csd(data_intervals[i],data_intervals[j],fs=sample_rate)
-        
-        delta, theta, alpha, beta, gamma = frequency_bands(f, Pxy)
-        
-        wpli_delta = abs(np.mean(abs(np.imag(delta)) * np.sign(np.imag(delta)))) / (np.mean(abs(np.imag(delta))))
-        wpli_theta = abs(np.mean(abs(np.imag(theta)) * np.sign(np.imag(theta)))) / (np.mean(abs(np.imag(theta))))
-        wpli_alpha = abs(np.mean(abs(np.imag(alpha)) * np.sign(np.imag(alpha)))) / (np.mean(abs(np.imag(alpha)))) 
-        wpli_beta = abs(np.mean(abs(np.imag(beta)) * np.sign(np.imag(beta)))) / (np.mean(abs(np.imag(beta))))
-        wpli_gamma = abs(np.mean(abs(np.imag(gamma)) * np.sign(np.imag(gamma)))) / (np.mean(abs(np.imag(gamma))))
-        
-        return wpli_delta, wpli_theta, wpli_alpha, wpli_beta, wpli_gamma
-    
-    if conn == 'plv':
-        sig1_delta, sig1_theta, sig1_alpha, sig1_beta, sig1_gamma = calculate_bands_fft(data_intervals[i], sample_rate)
-        sig2_delta, sig2_theta, sig2_alpha, sig2_beta, sig2_gamma = calculate_bands_fft(data_intervals[j], sample_rate)
-        
-        sig1_bands = instantaneous_phase([sig1_delta, sig1_theta, sig1_alpha, sig1_beta, sig1_gamma])
-        sig2_bands = instantaneous_phase([sig2_delta, sig2_theta, sig2_alpha, sig2_beta, sig2_gamma])
-        
-        complex_phase_diff_delta = np.exp(np.complex(0,1)*(sig1_bands[0] - sig2_bands[0]))
-        complex_phase_diff_theta = np.exp(np.complex(0,1)*(sig1_bands[1] - sig2_bands[1]))
-        complex_phase_diff_alpha = np.exp(np.complex(0,1)*(sig1_bands[2] - sig2_bands[2]))
-        complex_phase_diff_beta = np.exp(np.complex(0,1)*(sig1_bands[3] - sig2_bands[3]))
-        complex_phase_diff_gamma = np.exp(np.complex(0,1)*(sig1_bands[4] - sig2_bands[4]))
-        
-        plv_delta = np.abs(np.sum(complex_phase_diff_delta))/len(sig1_bands[0])
-        plv_theta = np.abs(np.sum(complex_phase_diff_theta))/len(sig1_bands[1])
-        plv_alpha = np.abs(np.sum(complex_phase_diff_alpha))/len(sig1_bands[2])
-        plv_beta = np.abs(np.sum(complex_phase_diff_beta))/len(sig1_bands[3])
-        plv_gamma = np.abs(np.sum(complex_phase_diff_gamma))/len(sig1_bands[4])
-        
-        return plv_delta, plv_theta, plv_alpha, plv_beta, plv_gamma
-    
-    if conn == 'pli':
-        sig1_delta, sig1_theta, sig1_alpha, sig1_beta, sig1_gamma = calculate_bands_fft(data_intervals[i], sample_rate)
-        sig2_delta, sig2_theta, sig2_alpha, sig2_beta, sig2_gamma = calculate_bands_fft(data_intervals[j], sample_rate)
-        
-        sig1_bands = instantaneous_phase([sig1_delta, sig1_theta, sig1_alpha, sig1_beta, sig1_gamma])
-        sig2_bands = instantaneous_phase([sig2_delta, sig2_theta, sig2_alpha, sig2_beta, sig2_gamma])
-        
-        phase_diff_delta = sig1_bands[0] - sig2_bands[0]
-        phase_diff_delta = (phase_diff_delta + np.pi) % (2 * np.pi) - np.pi
-        
-        phase_diff_theta = sig1_bands[1] - sig2_bands[1]
-        phase_diff_theta = (phase_diff_theta + np.pi) % (2 * np.pi) - np.pi
-        
-        phase_diff_alpha = sig1_bands[2] - sig2_bands[2]
-        phase_diff_alpha = (phase_diff_alpha + np.pi) % (2 * np.pi) - np.pi
-        
-        phase_diff_beta = sig1_bands[3] - sig2_bands[3]
-        phase_diff_beta  = (phase_diff_beta  + np.pi) % (2 * np.pi) - np.pi
-        
-        phase_diff_gamma = sig1_bands[4] - sig2_bands[4]
-        phase_diff_gamma  = (phase_diff_gamma  + np.pi) % (2 * np.pi) - np.pi
-        
-        pli_delta = abs(np.mean(np.sign(phase_diff_delta)))
-        pli_theta = abs(np.mean(np.sign(phase_diff_theta)))
-        pli_alpha = abs(np.mean(np.sign(phase_diff_alpha)))
-        pli_beta = abs(np.mean(np.sign(phase_diff_beta)))
-        pli_gamma = abs(np.mean(np.sign(phase_diff_gamma)))
-        
-        return pli_delta, pli_theta, pli_alpha, pli_beta, pli_gamma
-    
-    if conn == 'pli_no_bands':
-        sig1_phase = instantaneous_phase([data_intervals[i]])
-        sig2_phase = instantaneous_phase([data_intervals[j]])
-        phase_diff = sig1_phase[0] - sig2_phase[0]
-        phase_diff = (phase_diff  + np.pi) % (2 * np.pi) - np.pi
-        pli = abs(np.mean(np.sign(phase_diff)))
-        
-        return pli
-
-    
 def instantaneous_phase(bands):
     for i,item in enumerate(bands):
         #First obtain the analytical signal with hilbert transformation. 
@@ -548,16 +351,16 @@ def calculate_dtf(data_intervals, steps, channels, sample_rate, bands):
                         r+=1                  
     return matrix
 
-def calculate_connectivity_single_channel(data_intervals, sample_rate, conn):
+def calculate_connectivity_single_channel(data_intervals, sample_rate, connectivity):
     values = []
     
     for i in range (len(data_intervals)):
-        values.append(single_channel_connectivity(data_intervals[i], sample_rate, conn))
+        values.append(connectivity.single_channel_conn(data_intervals[i], sample_rate))
     
     return values
 
 
-def calculate_connectivity_single_channel_with_bands(data_intervals, sample_rate, conn, bands):
+def calculate_connectivity_single_channel_with_bands(data_intervals, sample_rate, connectivity, bands):
     values = []
     num_bands = sum(bands)
     
@@ -566,125 +369,11 @@ def calculate_connectivity_single_channel_with_bands(data_intervals, sample_rate
         
         for z,item in enumerate([delta, theta, alpha, beta, gamma]):
             if bands[z]:
-                values.append(single_channel_connectivity(item, sample_rate, conn))
+                values.append(connectivity.single_channel_conn(item, sample_rate))
                 
     return values
 
 
-def single_channel_connectivity(data, sample_rate, conn):
-    #Power Spectrum
-    #https://www.kite.com/python/answers/how-to-plot-a-power-spectrum-in-python
-    if conn == 'ps':
-        fourier_transform = np.fft.rfft(data)
-        abs_fourier_transform = np.abs(fourier_transform)
-        power_spectrum = np.square(abs_fourier_transform)
-        return power_spectrum.mean()
-       
-    #Spectral Entropy
-    #https://raphaelvallat.com/entropy/build/html/index.html
-    if conn == 'se':
-        se = spectral_entropy(data, sample_rate, method='welch', normalize=True)
-        return se
-    
-    #Shannon Entropy
-    #https://www.kite.com/python/answers/how-to-calculate-shannon-entropy-in-python
-    if conn == 'she':
-        pd_series = pd.Series(data)
-        counts = pd_series.value_counts()
-        she = entropy(counts)
-        return she
-
-def single_channel_graph(data, ch_names, channels, bands=None):     
-    num_graphs = int(len(data)/channels)
-    print("\nNumber of graphs created:", num_graphs)
-    nodes = process_channel_names(ch_names)
-    
-    G = {}
-    for i in range(num_graphs):
-        G[i] = nx.Graph()
-        G[i].add_nodes_from(nodes, values=5)
-        elegible_nodes = []
-        
-        #Calculate the 75th percentile of the channels
-        threshold = np.percentile(data[(i*channels):(((i+1)*channels)-1)], 75)
-
-        for j in range(channels):
-            if(data[(channels * i) + j]) > threshold:
-                elegible_nodes.append(nodes[j])
-        edges = combinations(elegible_nodes,2)        
-        G[i].add_edges_from(edges, weight = 1, thickness=1)
-        
-     #For each graph, we call the helper function "draw_graph". 
-    for k in range(num_graphs):
-        #plt.figure(k, figsize=(12,12))
-        #plt.title("--------------------------------\nGraph: " + str(k+1))
-        fig = draw_graph(G[k], False, True)
-        fig.update_layout(title='', plot_bgcolor='white' ) 
-        fig.write_html('plot' + str(k+1) + '.html', auto_open=True, default_height='100%', default_width='100%')
-
-#Visibility Graph
-def calculate_visibility_graphs(data_intervals, kernel):
-    VG = {}
-    for i in range(len(data_intervals)):
-        VG[i] = visibility_graph(data_intervals[i], kernel)
-    
-    return VG
-
-def visibility_graph(series, kernel):
-    G = nx.Graph()
-    
-    # convert list of magnitudes into list of tuples that hold the index
-    tseries = []
-    n = 0
-    for magnitude in series:
-        tseries.append( (n, magnitude ) )
-        n += 1
-
-    # contiguous time points always have visibility
-    for n in range(0,len(tseries)-1):
-        (ta, ya) = tseries[n]
-        (tb, yb) = tseries[n+1]
-        G.add_node(ta, mag=ya)
-        G.add_node(tb, mag=yb)
-        
-        edge_weight = calculate_vg_weight(tseries, kernel, ta, tb, ya, yb)
-        G.add_edge(ta, tb, weight = edge_weight)
-
-    for a,b in combinations(tseries, 2):
-        # two points, maybe connect
-        (ta, ya) = a
-        (tb, yb) = b
-
-        connect = True
-        
-        # let's see all other points in the series
-        for tc, yc in tseries[ta:tb]:
-            # other points, not a or b
-            if tc != ta and tc != tb:
-                # does c obstruct?
-                if yc > yb + (ya - yb) * ( (tb - tc) / (tb - ta) ):
-                    connect = False
-                    
-        if connect:
-            edge_weight = calculate_vg_weight(tseries, kernel, ta, tb, ya, yb)
-            G.add_edge(ta, tb, weight = edge_weight)
-
-    return G
-    
-def calculate_vg_weight(series, kernel, ta, tb, ya, yb):
-    if kernel == 'binary':
-        return 1
-    
-    #Mathur_2020
-    if kernel == 'gaussian':
-        std = np.std(series)
-        return exp(-((abs(ta-tb))**2)/ (2*(std)**2))
-    
-    #Supriya_2016
-    if kernel == 'weighted':
-        return atan((yb - ya)/(tb-ta))
-
-        
 def make_graph(matrix, ch_names, threshold):
     """Process to create the networkX graphs.
     Parameters
@@ -696,7 +385,7 @@ def make_graph(matrix, ch_names, threshold):
     """
     #The number of graphs will be the number of correlation matrixes. 
     num_graphs = len(matrix)
-    print("\nNumber of graphs created:", num_graphs)
+    print("Number of graphs created:", num_graphs)
     #Uses the helper function "process_channel_names" to obtain the names of the electrodes, to be used as nodes
     nodes = process_channel_names(ch_names)
     
@@ -714,68 +403,10 @@ def make_graph(matrix, ch_names, threshold):
                     #print("graph:",k,"Edge between:", i,j)
                     G[k].add_edge(nodes[i],nodes[j], thickness = pow(matrix[k][i,j], 3) * 6, weight = matrix[k][i,j])
     
-    #For each graph, we call the helper function "draw_graph". 
-    for k in range(num_graphs):
-        #plt.figure(k, figsize=(12,12))
-        #plt.title("--------------------------------\nGraph: " + str(k+1))
-        fig = draw_graph(G[k], False, False)
-        fig.update_layout(title='', plot_bgcolor='white' ) 
-        fig.write_html('plot' + str(k+1) + '.html', auto_open=True, default_height='100%', default_width='100%')
-                   
     
-    
-def make_directed_graph(matrix, ch_names, threshold):
-    
-    #The number of graphs will be the number of correlation matrixes. 
-    num_graphs = len(matrix)
-    print("\nNumber of graphs created:", num_graphs)
-    #Uses the helper function "process_channel_names" to obtain the names of the electrodes, to be used as nodes
-    nodes = process_channel_names(ch_names)
-    
-    G = {}
-    num_nodes = len(nodes)
-    
-    #Loop over the number of graphs, creating the nx Graph, adding the nodes (which will be the same in all graphs) and adding an edge if the connectivity measure is above the threshold.
-    #Also we add a weight to the edge, to draw the edge´s size according to this value. It is the connectivity coefficient to a power, to really difference big from smaller coefficients. 
-    for k in range(num_graphs):
-        G[k] = nx.DiGraph()
-        G[k].add_nodes_from(nodes)
-        for i in range(num_nodes):
-            for j in range(num_nodes):
-                if matrix[k][i,j] > threshold and i!=j:
-                    #print("graph:",k,"Edge between:", i,j)
-                    G[k].add_edge(nodes[i],nodes[j], thickness = pow(matrix[k][i,j], 3) * 6, weight = matrix[k][i,j])
-    
-    #For each graph, we call the helper function "draw_graph". 
-    for k in range(num_graphs):
-        #plt.figure(k, figsize=(12,12))
-        #plt.title("--------------------------------\nGraph: " + str(k+1))
-        fig = draw_graph(G[k], True, False)
-        fig.update_layout(title='', plot_bgcolor='white' ) 
-        fig.write_html('plot' + str(k+1) + '.html', auto_open=True, default_height='100%', default_width='100%')
+    return G        
         
         
-    
-def process_channel_names(channel_names):
-    """Process to obtain the electrode name from the channel name.
-    Parameters
-    ----------
-    channel_names : list
-        Channel names in the EEG.
-    
-    Returns
-    -------
-    channel_names : list
-        Proccessed channel names, containing only the name of the electrode.
-    """
-    
-    channel_names = [(elem.split())[-1] for elem in channel_names]
-    channel_names = [(elem.replace("-", " ").split())[0] for elem in channel_names]
-    print('Channel Names:', channel_names)
-    
-    return channel_names
-
-
 def draw_graph(G, directed, hover_nodes):
     """Process to create the networkX graphs.
     Parameters
