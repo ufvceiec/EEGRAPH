@@ -43,7 +43,7 @@ class Connectivity_single_channel_With_Bands(Strategy):
     def calculate_connectivity_workflow(self, data, bands, window_size):       
         self.bands = input_bands(bands)
         data_intervals, steps = calculate_time_intervals(data.raw_data, data.sample_rate, data.sample_duration, window_size, data.sample_length)
-        self.connectivity_matrix = calculate_connectivity_single_channel_with_bands(data_intervals, sample_rate, self, self.bands)
+        self.connectivity_matrix = calculate_connectivity_single_channel_with_bands(data_intervals, data.sample_rate, self, self.bands)
         
         return self.connectivity_matrix
 
@@ -52,7 +52,7 @@ class Connectivity_single_channel_No_Bands(Strategy):
     def calculate_connectivity_workflow(self, data, bands, window_size):
         dont_need_bands(bands)
         data_intervals, steps = calculate_time_intervals(data.raw_data, data.sample_rate, data.sample_duration, window_size, data.sample_length)
-        self.connectivity_matrix = calculate_connectivity_single_channel(data_intervals, sample_rate, self)
+        self.connectivity_matrix = calculate_connectivity_single_channel(data_intervals, data.sample_rate, self)
         
         return self.connectivity_matrix
 
@@ -70,8 +70,11 @@ class Cross_correlation_rescaled(Strategy):
 class Dtf_With_Bands(Strategy):
     def calculate_connectivity_workflow(self, data, bands, window_size):
         self.bands = input_bands(bands)
-        data_intervals, steps = calculate_time_intervals(raw_data, data.sample_rate, data.sample_duration, window_size, data.sample_length)
-        print(self.connectivity_matrix)
+        data_intervals, steps = calculate_time_intervals(data.raw_data, data.sample_rate, data.sample_duration, window_size, data.sample_length)
+        self.connectivity_matrix = calculate_dtf(data_intervals, steps, data.num_channels, data.sample_rate, self.bands)
+        
+        return self.connectivity_matrix
+        
         
         
 #Connectivity measures            
@@ -255,13 +258,6 @@ class Pli_No_Bands_Estimator(Connectivity_No_Bands):
         pli = abs(np.mean(np.sign(phase_diff)))
         
         return pli
-        
-class Dtf_Estimator(Dtf_With_Bands):
-    def __init__(self):
-        self.threshold = 0.3
-        
-    def calculate_conn(self, data_intervals, i, j, sample_rate, channels):   
-        pass
     
 class Power_spectrum_Estimator(Connectivity_single_channel_With_Bands):
     #https://www.kite.com/python/answers/how-to-plot-a-power-spectrum-in-python
@@ -284,3 +280,7 @@ class Shannon_entropy_Estimator(Connectivity_single_channel_No_Bands):
         counts = pd_series.value_counts()
         she = entropy(counts)
         return she
+
+class Dtf_Estimator(Dtf_With_Bands):
+    def __init__(self):
+        self.threshold = 0.3
