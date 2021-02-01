@@ -8,16 +8,23 @@ classifiers = [
     'Programming Language :: Python :: 3'
 ]
 
+if __name__ == "__main__":
+    install_requires = list()
+    with open('requirements.txt', 'r') as fid:
+        for line in fid:
+            req = line.strip()
+            install_requires.append(req)
+
 setup(
-    name='to_define',
-    version='0.0.1',
+    name='eegraph',
+    version='0.0.20',
     description='',
-    long_description=open('README.txt').read() + '\n\n' + open('CHANGELOG.txt').read(),
     url='',
     author='CEIEC',
     license= '',
     classifers=classifiers,
     keywords='',
     packages=find_packages(),
-    install_requires=['']
+    install_requires=install_requires
 )
+

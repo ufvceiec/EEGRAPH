@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import scot
 from scipy import signal
+from itertools import combinations
 import networkx as nx
 import plotly.graph_objects as go
 
@@ -83,8 +84,7 @@ def calculate_time_intervals(data, sample_rate, sample_duration, seconds, sample
             snippet = data[j][int(steps[i][0]):int(steps[i][1])]
             #Append the snippet 
             epochs.append(snippet)
-    
-    return np.array(epochs), steps
+    return np.array(epochs, dtype="object"), steps
                 
 def time_stamps(seconds, sample_rate, sample_length, sample_duration):
     """Process to calculate the intervals based on the window size or time intervals.
@@ -405,6 +405,28 @@ def make_graph(matrix, ch_names, threshold):
     
     
     return G        
+
+def single_channel_graph(data, ch_names, channels, bands=None):     
+    num_graphs = int(len(data)/channels)
+    print("Number of graphs created:", num_graphs)
+    nodes = process_channel_names(ch_names)
+    
+    G = {}
+    for i in range(num_graphs):
+        G[i] = nx.Graph()
+        G[i].add_nodes_from(nodes, values=5)
+        elegible_nodes = []
+        
+        #Calculate the 75th percentile of the channels
+        threshold = np.percentile(data[(i*channels):(((i+1)*channels)-1)], 75)
+
+        for j in range(channels):
+            if(data[(channels * i) + j]) > threshold:
+                elegible_nodes.append(nodes[j])
+        edges = combinations(elegible_nodes,2)        
+        G[i].add_edges_from(edges, weight = 1, thickness=1)
+        
+    return G
         
         
 def draw_graph(G, directed, hover_nodes):
