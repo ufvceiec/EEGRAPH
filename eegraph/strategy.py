@@ -2,11 +2,18 @@ import numpy as np
 import pandas as pd
 from scipy import signal, stats
 from scipy.stats import entropy
-#https://raphaelvallat.com/entropy/build/html/index.html
-from entropy import spectral_entropy
-
 from .tools import *
 from abc import ABC, abstractmethod
+
+#https://raphaelvallat.com/entropy/build/html/index.html
+try:
+    from entropy import spectral_entropy
+except:
+    print("Missing 'entropy' dependency...\nInstalling 'entropy' dependency...")
+    import sys
+    import subprocess
+    subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'git+https://github.com/raphaelvallat/entropy.git/'])
+    from entropy import spectral_entropy
 
 class Strategy(ABC):
     
@@ -16,9 +23,8 @@ class Strategy(ABC):
 
 
     def make_graph_workflow(self, data):
-        G = make_graph(self.connectivity_matrix, data.ch_names, data.threshold)
-    
-        return G
+        pass
+
 
 #Concrete Strategies, Workflows. 
 class Connectivity_No_Bands(Strategy):
@@ -29,6 +35,10 @@ class Connectivity_No_Bands(Strategy):
         
         return self.connectivity_matrix
     
+    def make_graph_workflow(self, data):
+        G = make_graph(self.connectivity_matrix, data.ch_names, data.threshold)
+    
+        return G
     
 class Connectivity_With_Bands(Strategy):
     def calculate_connectivity_workflow(self, data , bands, window_size):
@@ -38,6 +48,10 @@ class Connectivity_With_Bands(Strategy):
         
         return self.connectivity_matrix
 
+    def make_graph_workflow(self, data):
+        G = make_graph(self.connectivity_matrix, data.ch_names, data.threshold)
+    
+        return G
     
 class Connectivity_single_channel_With_Bands(Strategy):
     def calculate_connectivity_workflow(self, data, bands, window_size):       
@@ -47,6 +61,10 @@ class Connectivity_single_channel_With_Bands(Strategy):
         
         return self.connectivity_matrix
 
+    def make_graph_workflow(self, data):
+        G = single_channel_graph(self.connectivity_matrix, data.ch_names, data.num_channels, self.bands)
+    
+        return G
     
 class Connectivity_single_channel_No_Bands(Strategy):
     def calculate_connectivity_workflow(self, data, bands, window_size):
@@ -56,6 +74,10 @@ class Connectivity_single_channel_No_Bands(Strategy):
         
         return self.connectivity_matrix
 
+    def make_graph_workflow(self, data):
+        G = single_channel_graph(self.connectivity_matrix, data.ch_names, data.num_channels)
+    
+        return G
     
 class Cross_correlation_rescaled(Strategy):
     def calculate_connectivity_workflow(self, data, bands, window_size):
@@ -66,6 +88,10 @@ class Cross_correlation_rescaled(Strategy):
         
         return self.connectivity_matrix
         
+    def make_graph_workflow(self, data):
+        G = make_graph(self.connectivity_matrix, data.ch_names, data.threshold)
+    
+        return G
     
 class Dtf_With_Bands(Strategy):
     def calculate_connectivity_workflow(self, data, bands, window_size):
@@ -74,7 +100,11 @@ class Dtf_With_Bands(Strategy):
         self.connectivity_matrix = calculate_dtf(data_intervals, steps, data.num_channels, data.sample_rate, self.bands)
         
         return self.connectivity_matrix
-        
+
+    def make_graph_workflow(self, data):
+        G = make_graph(self.connectivity_matrix, data.ch_names, data.threshold)
+    
+        return G    
         
         
 #Connectivity measures            
@@ -179,12 +209,38 @@ class Wpli_Estimator(Connectivity_With_Bands):
         
         delta, theta, alpha, beta, gamma = frequency_bands(f, Pxy)
         
-        wpli_delta = abs(np.mean(abs(np.imag(delta)) * np.sign(np.imag(delta)))) / (np.mean(abs(np.imag(delta))))
-        wpli_theta = abs(np.mean(abs(np.imag(theta)) * np.sign(np.imag(theta)))) / (np.mean(abs(np.imag(theta))))
-        wpli_alpha = abs(np.mean(abs(np.imag(alpha)) * np.sign(np.imag(alpha)))) / (np.mean(abs(np.imag(alpha)))) 
-        wpli_beta = abs(np.mean(abs(np.imag(beta)) * np.sign(np.imag(beta)))) / (np.mean(abs(np.imag(beta))))
-        wpli_gamma = abs(np.mean(abs(np.imag(gamma)) * np.sign(np.imag(gamma)))) / (np.mean(abs(np.imag(gamma))))
+        delta_denominator = np.mean(abs(np.imag(delta)))
+        theta_denominator = np.mean(abs(np.imag(theta)))
+        alpha_denominator = np.mean(abs(np.imag(alpha)))
+        beta_denominator = np.mean(abs(np.imag(beta)))
+        gamma_denominator = np.mean(abs(np.imag(gamma)))
         
+        
+        if(delta_denominator):
+            wpli_delta = abs(np.mean(abs(np.imag(delta)) * np.sign(np.imag(delta)))) / (np.mean(abs(np.imag(delta))))
+        else:
+            wpli_delta = 0
+            
+        if(theta_denominator):
+            wpli_theta = abs(np.mean(abs(np.imag(theta)) * np.sign(np.imag(theta)))) / (np.mean(abs(np.imag(theta))))
+        else:
+            wpli_theta = 0
+           
+        if(alpha_denominator):           
+            wpli_alpha = abs(np.mean(abs(np.imag(alpha)) * np.sign(np.imag(alpha)))) / (np.mean(abs(np.imag(alpha)))) 
+        else:
+            wpli_alpha = 0
+           
+        if(beta_denominator): 
+            wpli_beta = abs(np.mean(abs(np.imag(beta)) * np.sign(np.imag(beta)))) / (np.mean(abs(np.imag(beta))))
+        else:
+            wpli_beta = 0
+           
+        if(gamma_denominator):
+            wpli_gamma = abs(np.mean(abs(np.imag(gamma)) * np.sign(np.imag(gamma)))) / (np.mean(abs(np.imag(gamma))))
+        else:
+            wpli_gamma = 0
+           
         return wpli_delta, wpli_theta, wpli_alpha, wpli_beta, wpli_gamma
     
 class Plv_Estimator(Connectivity_With_Bands):
@@ -260,6 +316,9 @@ class Pli_No_Bands_Estimator(Connectivity_No_Bands):
         return pli
     
 class Power_spectrum_Estimator(Connectivity_single_channel_With_Bands):
+    def __init__(self):
+        self.threshold = None
+        
     #https://www.kite.com/python/answers/how-to-plot-a-power-spectrum-in-python
     def single_channel_conn(self, data, sample_rate):
         fourier_transform = np.fft.rfft(data)
@@ -268,12 +327,19 @@ class Power_spectrum_Estimator(Connectivity_single_channel_With_Bands):
         return power_spectrum.mean()    
     
 class Spectral_entropy_Estimator(Connectivity_single_channel_With_Bands):
+    def __init__(self):
+        self.threshold = None
+        
     #https://raphaelvallat.com/entropy/build/html/index.html
     def single_channel_conn(self, data, sample_rate):
-        se = spectral_entropy(data, sample_rate, method='welch', normalize=True)
+        nperseg = len(data)
+        se = spectral_entropy(data, sample_rate, method='welch', nperseg = nperseg, normalize=True)
         return se
     
 class Shannon_entropy_Estimator(Connectivity_single_channel_No_Bands):
+    def __init__(self):
+        self.threshold = None
+        
     #https://www.kite.com/python/answers/how-to-calculate-shannon-entropy-in-python
     def single_channel_conn(self, data, sample_rate):
         pd_series = pd.Series(data)
