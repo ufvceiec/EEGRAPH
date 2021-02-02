@@ -1,4 +1,5 @@
 from setuptools import setup, find_packages
+from os import path
 
 classifiers = [
     'Development Status :: 5 - Production/Stable',
@@ -14,17 +15,23 @@ if __name__ == "__main__":
         for line in fid:
             req = line.strip()
             install_requires.append(req)
+            
+    this_directory = path.abspath(path.dirname(__file__))
+    with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+        long_description = f.read()
 
 setup(
     name='eegraph',
-    version='0.0.20',
+    version='0.0.24',
     description='',
-    url='',
+    url='https://github.com/ufvceiec/EEGRAPH',
     author='CEIEC',
-    license= '',
+    license= 'MIT',
     classifers=classifiers,
     keywords='',
     packages=find_packages(),
-    install_requires=install_requires
+    install_requires=install_requires,
+    long_description=long_description,
+    long_description_content_type='text/markdown'
 )
 
