@@ -32,7 +32,16 @@ def re_scaling(raw_data):
     scaled_data = df.to_numpy()
 
     return scaled_data
-        
+
+def yes_or_no(question):
+    reply = str(input(question+' (y/n): ')).lower().strip()
+    if reply[0] == 'y':
+        return True
+    if reply[0] == 'n':
+        return False
+    else:
+        return yes_or_no("Uhhhh... please enter ")
+
 def process_channel_names(channel_names):
     """Process to obtain the electrode name from the channel name.
     Parameters

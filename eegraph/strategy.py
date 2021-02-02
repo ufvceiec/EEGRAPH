@@ -9,12 +9,18 @@ from abc import ABC, abstractmethod
 try:
     from entropy import spectral_entropy
 except:
-    print("Missing 'entropy' dependency...\nInstalling 'entropy' dependency...")
-    import sys
-    import subprocess
-    subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'git+https://github.com/raphaelvallat/entropy.git/'])
-    from entropy import spectral_entropy
+    response = yes_or_no("Missing 'entropy' dependency...\nDo you want to install it?")
+    if(response):
+        print("Installing 'entropy'...")
+        import sys
+        import subprocess
+        subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'git+https://github.com/raphaelvallat/entropy.git/'])
+        from entropy import spectral_entropy
+        print("Dependency 'entropy' installed.")
+    else:
+        print("Connectivity Measure 'sprectal_entropy' will not be available.")
 
+    
 class Strategy(ABC):
     
     @abstractmethod
