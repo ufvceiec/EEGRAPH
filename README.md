@@ -26,7 +26,7 @@ What libraries you need to install.
 To install the latest stable version of EEGraph, you can use pip in a terminal:
 
 ```python
-pip install eegraph
+pip install EEGRAPH
 ```
 
 ## Functions
