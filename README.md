@@ -19,23 +19,7 @@ What libraries you need to install.
 * Plotly
 * Scipy
 * Scot
-```python
-pip install numpy
-pip install pandas
-pip install mne
-pip install matplotlib
-pip install networkx
-pip install plotly
-pip install scipy
-pip install scot
-```
 * Entropy
-```python
-git clone https://github.com/raphaelvallat/entropy.git entropy/
-cd entropy/
-pip install -r requirements.txt
-python setup.py develop
-```
 
 ### Installing EEGraph
 
@@ -64,7 +48,7 @@ The different supported EEG file formats by EEGraph.
 * eXimia | .nxe
 
 ### Connectivity Measures
-The different available connectivity measures in EEGraph. 
+The different available connectivity measures in EEGraph. Visit ![documentation](https://github.com/ufvceiec/EEGRAPH/wiki/Modelate-Data) for more info.
 
 * Cross Correlation
 * Pearson Correlation
@@ -82,9 +66,31 @@ The different available connectivity measures in EEGraph.
 
 ## Usage
 Example usage of the library with Pearson Correlation. 
+
+### Load data
 ```python
 import eegraph
-eegraph.connectivity.pearson_correlation(path="espasmo1.edf", window_size = 2, exclude = ['EEG TAntI1-TAntI', 'EEG TAntD1-TAntD'])
+G = eegraph.Graph()
+G.load_data(path= "espasmo1.edf", exclude = ['EEG TAntI1-TAntI', 'EEG TAntD1-TAntD', 'EEG EKG1-EKG2'])`
+```
+### Modelate data
+##### Without frequency bands
+```python
+graphs, connectivity_matrix = G.modelate(window_size = 2, connectivity = 'pearson_correlation')
+```
+##### With frequency bands
+```python
+graphs, connectivity_matrix = G.modelate(window_size = 2, connectivity = 'squared_coherence', bands = ['delta','theta','alpha'])
+```
+### Visualize graph
+```python
+G.visualize(graphs[0])
+```
+![Connectivity Graph Output Example](https://github.com/ufvceiec/EEGRAPH/blob/develop/demo/eegraph_output.gif)
+### Threshold
+A custom threshold can be specified as a parameter in modelate. Default threshold values can be found in the ![documentation](https://github.com/ufvceiec/EEGRAPH/wiki/Modelate-Data).
+```python
+graphs, connectivity_matrix = G.modelate(window_size = 2, connectivity = 'pearson_correlation', threshold = 0.8)
 ```
 ### Window size
 The window size can be defined as an _int_ or _list_. 
@@ -92,10 +98,6 @@ The window size can be defined as an _int_ or _list_.
 _int_: The set window size in seconds, e.g.(2). All the time intervals will be 2 seconds long.
 
 _list_: The specific time intervals in seconds, e.g.[0, 3, 8]. The time intervalls will be the same as specified in the input. 
-
-### Graph Visualization Example
-
-![Connectivity Graph Output Example](https://github.com/ufvceiec/EEGRAPH/blob/develop/demo/eegraph_output.gif)
 
 ## EEGraph Workflow
 ![EEGraph Workflow Example](https://github.com/ufvceiec/EEGRAPH/blob/develop/demo/eegraph_workflow.png)
