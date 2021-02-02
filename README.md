@@ -48,7 +48,7 @@ The different supported EEG file formats by EEGraph.
 * eXimia | .nxe
 
 ### Connectivity Measures
-The different available connectivity measures in EEGraph. Visit ![documentation](https://github.com/ufvceiec/EEGRAPH/wiki/Modelate-Data) for more info.
+The different available connectivity measures in EEGraph. Visit [documentation](https://github.com/ufvceiec/EEGRAPH/wiki/Modelate-Data) for more info.
 
 * Cross Correlation
 * Pearson Correlation
@@ -88,7 +88,7 @@ G.visualize(graphs[0])
 ```
 ![Connectivity Graph Output Example](https://github.com/ufvceiec/EEGRAPH/blob/develop/demo/eegraph_output.gif)
 ### Threshold
-A custom threshold can be specified as a parameter in modelate. Default threshold values can be found in the ![documentation](https://github.com/ufvceiec/EEGRAPH/wiki/Modelate-Data).
+A custom threshold can be specified as a parameter in modelate. Default threshold values can be found in the [documentation](https://github.com/ufvceiec/EEGRAPH/wiki/Modelate-Data).
 ```python
 graphs, connectivity_matrix = G.modelate(window_size = 2, connectivity = 'pearson_correlation', threshold = 0.8)
 ```
