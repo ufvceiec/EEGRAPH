@@ -71,7 +71,7 @@ Example usage of the library with Pearson Correlation.
 ```python
 import eegraph
 G = eegraph.Graph()
-G.load_data(path= "espasmo1.edf", exclude = ['EEG TAntI1-TAntI', 'EEG TAntD1-TAntD', 'EEG EKG1-EKG2'])`
+G.load_data(path= "espasmo1.edf", exclude = ['EEG TAntI1-TAntI', 'EEG TAntD1-TAntD', 'EEG EKG1-EKG2'])
 ```
 ### Modelate data
 ##### Without frequency bands
