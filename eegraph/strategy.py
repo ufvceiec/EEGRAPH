@@ -36,7 +36,7 @@ class Strategy(ABC):
 class Connectivity_No_Bands(Strategy):
     def calculate_connectivity_workflow(self, data, bands, window_size):
         dont_need_bands(bands)
-        data_intervals, steps = calculate_time_intervals(data.raw_data, data.sample_rate, data.sample_duration, window_size, data.sample_length)
+        data_intervals, steps, self.flag = calculate_time_intervals(data.raw_data, data.sample_rate, data.sample_duration, window_size, data.sample_length)
         self.connectivity_matrix = calculate_connectivity(data_intervals, steps, data.num_channels, data.sample_rate, self)
         
         return self.connectivity_matrix
@@ -49,7 +49,7 @@ class Connectivity_No_Bands(Strategy):
 class Connectivity_With_Bands(Strategy):
     def calculate_connectivity_workflow(self, data , bands, window_size):
         self.bands = input_bands(bands)
-        data_intervals, steps = calculate_time_intervals(data.raw_data, data.sample_rate, data.sample_duration, window_size, data.sample_length)
+        data_intervals, steps, self.flag = calculate_time_intervals(data.raw_data, data.sample_rate, data.sample_duration, window_size, data.sample_length)
         self.connectivity_matrix = calculate_connectivity_with_bands(data_intervals, steps, data.num_channels, data.sample_rate, self, self.bands)
         
         return self.connectivity_matrix
@@ -62,7 +62,7 @@ class Connectivity_With_Bands(Strategy):
 class Connectivity_single_channel_With_Bands(Strategy):
     def calculate_connectivity_workflow(self, data, bands, window_size):       
         self.bands = input_bands(bands)
-        data_intervals, steps = calculate_time_intervals(data.raw_data, data.sample_rate, data.sample_duration, window_size, data.sample_length)
+        data_intervals, steps, self.flag = calculate_time_intervals(data.raw_data, data.sample_rate, data.sample_duration, window_size, data.sample_length)
         self.connectivity_matrix = calculate_connectivity_single_channel_with_bands(data_intervals, data.sample_rate, self, self.bands)
         
         return self.connectivity_matrix
@@ -75,7 +75,7 @@ class Connectivity_single_channel_With_Bands(Strategy):
 class Connectivity_single_channel_No_Bands(Strategy):
     def calculate_connectivity_workflow(self, data, bands, window_size):
         dont_need_bands(bands)
-        data_intervals, steps = calculate_time_intervals(data.raw_data, data.sample_rate, data.sample_duration, window_size, data.sample_length)
+        data_intervals, steps, self.flag = calculate_time_intervals(data.raw_data, data.sample_rate, data.sample_duration, window_size, data.sample_length)
         self.connectivity_matrix = calculate_connectivity_single_channel(data_intervals, data.sample_rate, self)
         
         return self.connectivity_matrix
@@ -89,7 +89,7 @@ class Cross_correlation_rescaled(Strategy):
     def calculate_connectivity_workflow(self, data, bands, window_size):
         dont_need_bands(bands)
         scaled_data = re_scaling(data.raw_data)
-        data_intervals, steps = calculate_time_intervals(scaled_data, data.sample_rate, data.sample_duration, window_size, data.sample_length)
+        data_intervals, steps, self.flag = calculate_time_intervals(scaled_data, data.sample_rate, data.sample_duration, window_size, data.sample_length)
         self.connectivity_matrix = calculate_connectivity(data_intervals, steps, data.num_channels, data.sample_rate, self)
         
         return self.connectivity_matrix
@@ -102,7 +102,7 @@ class Cross_correlation_rescaled(Strategy):
 class Dtf_With_Bands(Strategy):
     def calculate_connectivity_workflow(self, data, bands, window_size):
         self.bands = input_bands(bands)
-        data_intervals, steps = calculate_time_intervals(data.raw_data, data.sample_rate, data.sample_duration, window_size, data.sample_length)
+        data_intervals, steps, self.flag = calculate_time_intervals(data.raw_data, data.sample_rate, data.sample_duration, window_size, data.sample_length)
         self.connectivity_matrix = calculate_dtf(data_intervals, steps, data.num_channels, data.sample_rate, self.bands)
         
         return self.connectivity_matrix
