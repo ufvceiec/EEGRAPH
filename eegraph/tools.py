@@ -84,7 +84,7 @@ def calculate_time_intervals(data, sample_rate, sample_duration, seconds, sample
     epochs = []
     
     #Obtain the steps using the time_stamps helper function. 
-    steps = time_stamps(seconds, sample_rate, sample_length, sample_duration)
+    steps, flag = time_stamps(seconds, sample_rate, sample_length, sample_duration)
     
     #Loop over the intervals.
     for i,_ in enumerate(steps):
@@ -93,7 +93,7 @@ def calculate_time_intervals(data, sample_rate, sample_duration, seconds, sample
             snippet = data[j][int(steps[i][0]):int(steps[i][1])]
             #Append the snippet 
             epochs.append(snippet)
-    return np.array(epochs, dtype="object"), steps
+    return np.array(epochs, dtype="object"), steps, flag
                 
 def time_stamps(seconds, sample_rate, sample_length, sample_duration):
     """Process to calculate the intervals based on the window size or time intervals.
@@ -114,7 +114,7 @@ def time_stamps(seconds, sample_rate, sample_length, sample_duration):
         List with the intervals, pairs of (Start, End) values in data points (seconds x sample frequency).
     """
     
-    intervals, i= [] , 0
+    intervals, i, flag = [] , 0, 0
     
     #If the input is a list, but only contains one value it is a window size. 
     if type(seconds) == list:
@@ -156,9 +156,13 @@ def time_stamps(seconds, sample_rate, sample_length, sample_duration):
         #This new interval will not be the same size as the others. 
         if(i+samples_per_frame > sample_length):
             intervals.append((i,sample_length))
-
-    print("Intervals: ",intervals)
-    return intervals
+            
+    print("Intervals: ", intervals)
+    if (len(intervals) == 1):
+        intervals.append((0, sample_rate))
+        flag = 1
+        
+    return intervals, flag
 
 def input_bands(bands):
     """Process to identify which bands does the user want to use.
@@ -291,6 +295,11 @@ def calculate_connectivity(data_intervals, steps, channels, sample_rate, connect
             for y,j in enumerate(range(start, stop)):
                 matrix[k][x,y] = connectivity.calculate_conn(data_intervals, i, j, sample_rate, channels)
 
+    if (connectivity.flag):
+        aux = np.zeros(shape=(intervals-1, channels, channels))
+        aux[0] = matrix[0, :, :]
+        return aux
+        
     return matrix
 
 def calculate_connectivity_with_bands(data_intervals, steps, channels, sample_rate, connectivity, bands):
@@ -320,6 +329,10 @@ def calculate_connectivity_with_bands(data_intervals, steps, channels, sample_ra
                         matrix[(k * num_bands) + r][x,y] = item
                         r+=1
                         
+    if (connectivity.flag):
+        aux = matrix[:num_bands, :, :]
+        return aux
+    
     return matrix
 
 
@@ -366,8 +379,11 @@ def calculate_dtf(data_intervals, steps, channels, sample_rate, bands):
 
 def calculate_connectivity_single_channel(data_intervals, sample_rate, connectivity):
     values = []
+    intervals = len(data_intervals)
+    if(connectivity.flag):
+        intervals = int(len(data_intervals)/2)
     
-    for i in range (len(data_intervals)):
+    for i in range (intervals):
         values.append(connectivity.single_channel_conn(data_intervals[i], sample_rate))
     
     return values
@@ -376,8 +392,11 @@ def calculate_connectivity_single_channel(data_intervals, sample_rate, connectiv
 def calculate_connectivity_single_channel_with_bands(data_intervals, sample_rate, connectivity, bands):
     values = []
     num_bands = sum(bands)
+    intervals = len(data_intervals)
+    if(connectivity.flag):
+        intervals = int(len(data_intervals)/2)
     
-    for i in range (len(data_intervals)):
+    for i in range (intervals):
         delta, theta, alpha, beta, gamma = calculate_bands_fft(data_intervals[i], sample_rate)
         
         for z,item in enumerate([delta, theta, alpha, beta, gamma]):
