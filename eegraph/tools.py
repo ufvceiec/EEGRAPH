@@ -156,8 +156,10 @@ def time_stamps(seconds, sample_rate, sample_length, sample_duration):
         #This new interval will not be the same size as the others. 
         if(i+samples_per_frame > sample_length):
             intervals.append((i,sample_length))
-            
-    print("Intervals: ", intervals)
+    
+    #Round the intervals for the printed output
+    intervals_rounded = [(round(steps[0],2), round(steps[1],2)) for steps in intervals]
+    print("Intervals: ", intervals_rounded)
     if (len(intervals) == 1):
         intervals.append((0, sample_rate))
         flag = 1
