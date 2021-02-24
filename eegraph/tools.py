@@ -5,6 +5,7 @@ from scipy import signal
 from itertools import combinations
 import networkx as nx
 import plotly.graph_objects as go
+import logging
 
 connectivity_measures = {'cross_correlation': 'Cross_correlation_Estimator', 'pearson_correlation': 'Pearson_correlation_Estimator', 'squared_coherence': 'Squared_coherence_Estimator',
                          'imag_coherence': 'Imag_coherence_Estimator', 'corr_cross_correlation': 'Corr_cross_correlation_Estimator', 'wpli': 'Wpli_Estimator', 
@@ -195,7 +196,7 @@ def input_bands(bands):
     print('Frequency Bands:', freq_bands, wanted_bands)
     return wanted_bands
 
-def calculate_bands_fft(values, sample_rate):
+def calculate_bands_fft(values, sample_rate, bands):
     """Process to calculate the numpy fft for the snippets.
     Parameters
     ----------
@@ -211,20 +212,27 @@ def calculate_bands_fft(values, sample_rate):
     fft_vals : ndarray
         Values calculated with the Fast Fourier Transform.
     """
+    bands_dict = {0: 'Delta', 1:'Theta', 2:'Alpha', 3:'Beta', 4:'Gamma'}
     
     fft_vals = np.absolute(np.fft.fft(values))
     fft_freq = np.fft.fftfreq(len(values), 1/sample_rate)
     
+    bands_list = frequency_bands(fft_freq, fft_vals)
+    output_bands = [None] * 5
     
-    delta1, theta1, alpha1, beta1, gamma1 = frequency_bands(fft_freq, fft_vals)
+    for x,band in enumerate(bands_list):
+        if(len(band)<1):
+            if(bands[x]):
+                logging.warn(' Frequency band ' + bands_dict[x] + ' has no values. Either dont use this frequency band or use a bigger window size.')
+                print('\n')
+                output_bands[x] = np.absolute(np.fft.ifft(bands_list[x]))
+            else:
+                output_bands[x] = [0,0]
+        else:
+            output_bands[x] = np.absolute(np.fft.ifft(bands_list[x]))
+            
     
-    delta = np.absolute(np.fft.ifft(delta1))
-    theta= np.absolute(np.fft.ifft(theta1))
-    alpha= np.absolute(np.fft.ifft(alpha1))
-    beta= np.absolute(np.fft.ifft(beta1))
-    gamma= np.absolute(np.fft.ifft(gamma1))
-    
-    return delta, theta, alpha, beta, gamma
+    return output_bands[0], output_bands[1], output_bands[2], output_bands[3], output_bands[4]
 
 
 def frequency_bands(f,Y):
@@ -320,7 +328,7 @@ def calculate_connectivity_with_bands(data_intervals, steps, channels, sample_ra
         #Loop over 
         for x,i in enumerate(range(start, stop)):
             for y,j in enumerate(range(start, stop)):
-                delta, theta, alpha, beta, gamma = connectivity.calculate_conn(data_intervals, i, j, sample_rate, channels)
+                delta, theta, alpha, beta, gamma = connectivity.calculate_conn(data_intervals, i, j, sample_rate, channels, bands)
                 r=0
                 for z, item in enumerate ([delta, theta, alpha, beta, gamma]):
                     if bands[z]:
