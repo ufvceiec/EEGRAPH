@@ -155,7 +155,7 @@ class Squared_coherence_Estimator(Connectivity_With_Bands):
     def __init__(self):
         self.threshold = 0.65
         
-    def calculate_conn(self, data_intervals, i, j, sample_rate, channels):
+    def calculate_conn(self, data_intervals, i, j, sample_rate, channels, bands):
         f, Cxy = (signal.coherence(data_intervals[i], data_intervals[j], sample_rate))
         
         delta, theta, alpha, beta, gamma = frequency_bands(f, Cxy)
@@ -166,7 +166,7 @@ class Imag_coherence_Estimator(Connectivity_With_Bands):
     def __init__(self):
         self.threshold = 0.4
         
-    def calculate_conn(self, data_intervals, i, j, sample_rate, channels):
+    def calculate_conn(self, data_intervals, i, j, sample_rate, channels, bands):
         _, Pxx = signal.welch(data_intervals[i], fs=sample_rate)
         _, Pyy = signal.welch(data_intervals[j], fs=sample_rate)
         f, Pxy = signal.csd(data_intervals[i],data_intervals[j],fs=sample_rate)
@@ -210,7 +210,7 @@ class Wpli_Estimator(Connectivity_With_Bands):
     def __init__(self):
         self.threshold = 0.45
         
-    def calculate_conn(self, data_intervals, i, j, sample_rate, channels):
+    def calculate_conn(self, data_intervals, i, j, sample_rate, channels, bands):
         f, Pxy = signal.csd(data_intervals[i],data_intervals[j],fs=sample_rate)
         
         delta, theta, alpha, beta, gamma = frequency_bands(f, Pxy)
@@ -253,9 +253,9 @@ class Plv_Estimator(Connectivity_With_Bands):
     def __init__(self):
         self.threshold = 0.8
         
-    def calculate_conn(self, data_intervals, i, j, sample_rate, channels):
-        sig1_delta, sig1_theta, sig1_alpha, sig1_beta, sig1_gamma = calculate_bands_fft(data_intervals[i], sample_rate)
-        sig2_delta, sig2_theta, sig2_alpha, sig2_beta, sig2_gamma = calculate_bands_fft(data_intervals[j], sample_rate)
+    def calculate_conn(self, data_intervals, i, j, sample_rate, channels, bands):
+        sig1_delta, sig1_theta, sig1_alpha, sig1_beta, sig1_gamma = calculate_bands_fft(data_intervals[i], sample_rate, bands)
+        sig2_delta, sig2_theta, sig2_alpha, sig2_beta, sig2_gamma = calculate_bands_fft(data_intervals[j], sample_rate, bands)
         
         sig1_bands = instantaneous_phase([sig1_delta, sig1_theta, sig1_alpha, sig1_beta, sig1_gamma])
         sig2_bands = instantaneous_phase([sig2_delta, sig2_theta, sig2_alpha, sig2_beta, sig2_gamma])
@@ -278,9 +278,9 @@ class Pli_Bands_Estimator(Connectivity_With_Bands):
     def __init__(self):
         self.threshold = 0.1
         
-    def calculate_conn(self, data_intervals, i, j, sample_rate, channels):
-        sig1_delta, sig1_theta, sig1_alpha, sig1_beta, sig1_gamma = calculate_bands_fft(data_intervals[i], sample_rate)
-        sig2_delta, sig2_theta, sig2_alpha, sig2_beta, sig2_gamma = calculate_bands_fft(data_intervals[j], sample_rate)
+    def calculate_conn(self, data_intervals, i, j, sample_rate, channels, bands):
+        sig1_delta, sig1_theta, sig1_alpha, sig1_beta, sig1_gamma = calculate_bands_fft(data_intervals[i], sample_rate, bands)
+        sig2_delta, sig2_theta, sig2_alpha, sig2_beta, sig2_gamma = calculate_bands_fft(data_intervals[j], sample_rate, bands)
         
         sig1_bands = instantaneous_phase([sig1_delta, sig1_theta, sig1_alpha, sig1_beta, sig1_gamma])
         sig2_bands = instantaneous_phase([sig2_delta, sig2_theta, sig2_alpha, sig2_beta, sig2_gamma])
