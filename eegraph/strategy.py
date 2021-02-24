@@ -103,7 +103,7 @@ class Dtf_With_Bands(Strategy):
     def calculate_connectivity_workflow(self, data, bands, window_size):
         self.bands = input_bands(bands)
         data_intervals, steps, self.flag = calculate_time_intervals(data.raw_data, data.sample_rate, data.sample_duration, window_size, data.sample_length)
-        self.connectivity_matrix = calculate_dtf(data_intervals, steps, data.num_channels, data.sample_rate, self.bands)
+        self.connectivity_matrix = calculate_dtf(data_intervals, steps, data.num_channels, data.sample_rate, self.bands, self.flag)
         
         return self.connectivity_matrix
 

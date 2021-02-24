@@ -355,9 +355,9 @@ def instantaneous_phase(bands):
     return bands
 
 
-def calculate_dtf(data_intervals, steps, channels, sample_rate, bands):
+def calculate_dtf(data_intervals, steps, channels, sample_rate, bands, flag):
     num_bands = sum(bands)
-    intervals = (len(steps))
+    intervals = (len(steps)) - flag
     matrix = np.zeros(shape=((intervals * num_bands), channels, channels))
     start, stop = 0, channels
     
@@ -372,7 +372,11 @@ def calculate_dtf(data_intervals, steps, channels, sample_rate, bands):
             start = stop
             stop+= channels
             
-        ws.set_data(data_intervals[start:stop])
+        data = []
+        for h in range(start, stop):
+            data.append(data_intervals[h])
+        
+        ws.set_data(data)
         ws.do_mvarica()
         ws.fit_var()
         results = ws.get_connectivity('DTF')
@@ -383,7 +387,10 @@ def calculate_dtf(data_intervals, steps, channels, sample_rate, bands):
                 r=0
                 for z, item in enumerate ([delta, theta, alpha, beta, gamma]):
                     if bands[z]:
-                        matrix[(k * num_bands) + r][x,y] = item.mean()
+                        if (len(item)!= 0):
+                            matrix[(k * num_bands) + r][x,y] = item.mean()
+                        else:
+                            matrix[(k * num_bands) + r][x,y] = 0
                         r+=1                  
     return matrix
 
@@ -407,7 +414,7 @@ def calculate_connectivity_single_channel_with_bands(data_intervals, sample_rate
         intervals = int(len(data_intervals)/2)
     
     for i in range (intervals):
-        delta, theta, alpha, beta, gamma = calculate_bands_fft(data_intervals[i], sample_rate)
+        delta, theta, alpha, beta, gamma = calculate_bands_fft(data_intervals[i], sample_rate, bands)
         
         for z,item in enumerate([delta, theta, alpha, beta, gamma]):
             if bands[z]:
