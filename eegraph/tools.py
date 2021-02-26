@@ -469,11 +469,13 @@ def single_channel_graph(data, ch_names, channels, bands=None):
         #Calculate the 75th percentile of the channels
         threshold = np.percentile(data[(i*channels):(((i+1)*channels)-1)], 75)
 
+
         for j in range(channels):
-            if(data[(channels * i) + j]) > threshold:
+            if(data[(channels * i) + j]) >= threshold:
                 elegible_nodes.append(nodes[j])
         edges = combinations(elegible_nodes,2)        
         G[i].add_edges_from(edges, weight = 1, thickness=1)
+        
         
     return G
         
