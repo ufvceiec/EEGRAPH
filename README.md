@@ -83,6 +83,12 @@ graphs, connectivity_matrix = G.modelate(window_size = 2, connectivity = 'pearso
 graphs, connectivity_matrix = G.modelate(window_size = 2, connectivity = 'squared_coherence', bands = ['delta','theta','alpha'])
 ```
 ### Visualize graph
+In order to visualize graphs, EEG channel names must be in one of the following formats:
+* Standard: 'Fp1', 'Fp2', 'C3', 'Cz'...
+* Dash separated: 'EEG-Fp1', 'EEG-Fp2', 'EEG-C3', 'EEG-Cz'...
+* Space separated: 'EEG Fp1', 'EEG Fp2', 'EEG C3', 'EEG Cz',
+
+The information on the left side of the separator (Dash or Space) will be ignored, the standard electrode name must be on the right side. 
 ```python
 G.visualize(graphs[0])
 ```
