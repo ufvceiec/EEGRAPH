@@ -106,7 +106,13 @@ _int_: The set window size in seconds, e.g.(2). All the time intervals will be 2
 _list_: The specific time intervals in seconds, e.g.[0, 3, 8]. The time intervalls will be the same as specified in the input. 
 
 ## EEGraph Workflow
-![EEGraph Workflow Example](https://github.com/ufvceiec/EEGRAPH/blob/develop/demo/eegraph_workflow.png)
+![EEGraph Workflow Example](https://github.com/ufvceiec/EEGRAPH/blob/develop-refactor/demo/eegraph_workflow.png)
+
+## Disclaimer
+* External dependency 'Entropy' can´t be installed with pip. The installation will happen when EEGraph is imported, a message will appear in the command line asking for permissions to install the missing dependency. 
+
+
+* There is a known issue with DTF connectivity, sometimes the error 'math domain error' is shown, it is part of an external library. 
 
 ## Versioning
 See [CHANGELOG.txt](CHANGELOG.txt) for major/breaking updates and version history.
