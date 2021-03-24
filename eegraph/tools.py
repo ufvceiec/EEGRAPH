@@ -701,3 +701,4 @@ def get_node_trace(G):
 
     return node_trace
 
+    

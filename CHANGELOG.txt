@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+0.1.6 (03/22/2021)
+------------------
+- Adding the option to include a electrode montage file for channel labels, in method load_data(). 
+
 0.1.5 (02/26/2021)
 ------------------
 - Fixing issue with spectral entropy that returned empty graph, when the top 25% top values are the same. 
