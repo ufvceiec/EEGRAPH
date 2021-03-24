@@ -110,7 +110,7 @@ In order to visualize graphs, EEG channel names must be in one of the following 
 
 The information on the left side of the separator (Dash or Space) will be ignored, the standard electrode name must be on the right side. 
 ```python
-G.visualize(graphs[0])
+G.visualize(graphs[0], 'graph_1')
 ```
 ![Connectivity Graph Output Example](https://github.com/ufvceiec/EEGRAPH/blob/develop/demo/eegraph_output.gif)
 
