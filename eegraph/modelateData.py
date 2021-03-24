@@ -2,9 +2,9 @@ from .strategy import *
 
 #Class that uses the Strategy Abstract class
 class ModelData: 
-    def __init__(self, data, strategy: Strategy):
+    def __init__(self, data, ch_names, strategy: Strategy):
         self.raw_data = data.get_data()
-        self.ch_names = data.ch_names
+        self.ch_names = ch_names
         self.num_channels = data.info['nchan']
         self.sample_rate = data.info['sfreq']
         self.sample_duration = data.times.max()
