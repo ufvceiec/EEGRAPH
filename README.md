@@ -66,8 +66,8 @@ The different available connectivity measures in EEGraph. Visit [documentation](
 
 ## Usage
 Example usage of the library with Pearson Correlation. 
-### Load data
 ***
+### Load data
 ```python
 import eegraph
 G = eegraph.Graph()
@@ -80,8 +80,8 @@ import eegraph
 G = eegraph.Graph()
 G.load_data(path = "espasmo1.edf", electrode_montage_path = 'electrodemontage.set.ced')
 ```
-### Modelate data
 ***
+### Modelate data
 ##### Without frequency bands
 ```python
 graphs, connectivity_matrix = G.modelate(window_size = 2, connectivity = 'pearson_correlation')
@@ -101,9 +101,8 @@ The window size can be defined as an _int_ or _list_.
 _int_: The set window size in seconds, e.g.(2). All the time intervals will be 2 seconds long.
 
 _list_: The specific time intervals in seconds, e.g.[0, 3, 8]. The time intervalls will be the same as specified in the input. 
-
-### Visualize graph
 ***
+### Visualize graph
 In order to visualize graphs, EEG channel names must be in one of the following formats:
 * Standard: 'Fp1', 'Fp2', 'C3', 'Cz'...
 * Dash separated: 'EEG-Fp1', 'EEG-Fp2', 'EEG-C3', 'EEG-Cz'...
