@@ -1,9 +1,10 @@
 Change Log
 ==========
 
-0.1.6 (03/22/2021)
+0.1.6 (03/25/2021)
 ------------------
 - Adding the option to include a electrode montage file for channel labels, in method load_data(). 
+- Adding warning if a channel label is not a recognize electrode position, it will be ignored for visualization. 
 
 0.1.5 (02/26/2021)
 ------------------
