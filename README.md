@@ -32,7 +32,7 @@ pip install EEGRAPH
 ## Functions
 
 ### Documentation
-[EEGraph documentation](https://github.com/ufvceiec/EEGRAPH/wiki) is available online.
+[EEGraph documentation](https://github.com/ufvceiec/EEGRAPH/wiki) is available online. [Examples](https://github.com/ufvceiec/EEGRAPH/blob/develop-refactor/Examples/EEGraph_Example.ipynb) of usage are also available.
 
 ### Importing EEG data 
 The different supported EEG file formats by EEGraph.
