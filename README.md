@@ -105,10 +105,12 @@ _list_: The specific time intervals in seconds, e.g.[0, 3, 8]. The time interval
 ### Visualize graph
 In order to visualize graphs, EEG channel names must be in one of the following formats:
 * Standard: 'Fp1', 'Fp2', 'C3', 'Cz'...
-* Dash separated: 'EEG-Fp1', 'EEG-Fp2', 'EEG-C3', 'EEG-Cz'...
-* Space separated: 'EEG Fp1', 'EEG Fp2', 'EEG C3', 'EEG Cz',
+* Dash separated: 'Fp1-EEG', 'Fp2-EEG', 'C3-EEG', 'Cz-EEG'...
+* Space separated: 'EEG Fp1', 'EEG Fp2', 'EEG C3', 'EEG Cz'...
 
-The information on the left side of the separator (Dash or Space) will be ignored, the standard electrode name must be on the right side. 
+For the Space separtor the information on the left side of the separator will be ignored, the standard electrode name must be on the right side. 
+For the Dash separtor the information on the right side of the separator will be ignored, the standard electrode name must be on the left side. 
+
 ```python
 G.visualize(graphs[0], 'graph_1')
 ```
