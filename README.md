@@ -109,6 +109,7 @@ In order to visualize graphs, EEG channel names must be in one of the following 
 * Space separated: 'EEG Fp1', 'EEG Fp2', 'EEG C3', 'EEG Cz'...
 
 For the Space separtor the information on the left side of the separator will be ignored, the standard electrode name must be on the right side. 
+
 For the Dash separtor the information on the right side of the separator will be ignored, the standard electrode name must be on the left side. 
 
 ```python
