@@ -16,7 +16,7 @@ You can contribute to EEGraph in many ways:
 When you sumbit your code to EEGraph, you implicitly agree to adopt the associated licenses. Your work will be distributed under [MIT License](https://github.com/ufvceiec/EEGRAPH/blob/develop-refactor/LICENSE) once your pull request is merged. 
 
 ## :bulb: Suggesting a feature 
-If you have a good idea for a featue please let us know! From improvements for already existing functionalities to completely new features. 
+If you have a good idea for a feature please let us know! From improvements for already existing functionalities to completely new features. 
 
 Make sure to:
 * Check if there is a newer version which already provides this feature. 
