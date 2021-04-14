@@ -25,7 +25,7 @@ Make sure to:
 * Consider if its necessary in the library.
 
 ## :beetle: Filing a bug report 
-If you find some sort of bug, problem or something that should be updated. Please first search the open [issues](https://github.com/ufvceiec/EEGRAPH/issues) to see if someone has already reported the issues.
+If you find some sort of bug, problem or something that should be updated. Please first search the open [issues](https://github.com/ufvceiec/EEGRAPH/issues) to see if someone has already reported the issue.
 
 If its something new, please file a bug report on the repository [issue](https://github.com/ufvceiec/EEGRAPH/issues) section to let us know. Be as detailed as posible, and be ready to give us some feedback if needed. Make sure to:
 
@@ -35,7 +35,7 @@ If its something new, please file a bug report on the repository [issue](https:/
 * Be ready to provide feedback if needed. 
 
 ## :orange_book: Improving documentation
-The documentation for EEGraph can be founde [here](https://github.com/ufvceiec/EEGRAPH/wiki). Clear and complete documentation is key for users to understand the library and the code. Please dont hesitate to submit any feedback to improve it, like recomendations, single-letter typos, errors, extensions. Anything that improves the documentation for all furute users is welcomed.  
+The documentation for EEGraph can be founde [here](https://github.com/ufvceiec/EEGRAPH/wiki). Clear and complete documentation is key for users to understand the library and the code. Please dont hesitate to submit any feedback to improve it, recomendations, single-letter typos, errors, extensions. Anything that improves the documentation for all future users is welcomed.  
 
 Documentation related issues should be tagged with the `documentation` issue [label](https://github.com/ufvceiec/EEGRAPH/labels).
 
