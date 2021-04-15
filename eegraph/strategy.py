@@ -2,25 +2,22 @@ import numpy as np
 import pandas as pd
 from scipy import signal, stats
 from scipy.stats import entropy
-import subprocess
 from .tools import *
 from abc import ABC, abstractmethod
 
 
 #https://raphaelvallat.com/entropy/build/html/index.html
-try:
+response = yes_or_no("Missing 'entropy' dependency...\nDo you want to install it?")
+if(response):
+    print("Installing 'entropy'...")
+    import sys
+    import subprocess
+    subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'git+https://github.com/raphaelvallat/entropy.git/'])
     from entropy import spectral_entropy
-except:
-    response = subprocess.run(yes_or_no("Missing 'entropy' dependency...\nDo you want to install it?"), timeout=10)
-    if(response):
-        print("Installing 'entropy'...")
-        import sys
-        import subprocess
-        subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'git+https://github.com/raphaelvallat/entropy.git/'])
-        from entropy import spectral_entropy
-        print("Dependency 'entropy' installed.")
-    else:
-        print("Connectivity Measure 'sprectal_entropy' will not be available.")
+    print("Dependency 'entropy' installed.")
+else:
+    print("Connectivity Measure 'sprectal_entropy' will not be available.")
+
 
     
 class Strategy(ABC):
