@@ -119,12 +119,9 @@ G.visualize(graphs[0], 'graph_1')
 
 ## EEGraph Workflow
 ![EEGraph Workflow Example](https://github.com/ufvceiec/EEGRAPH/blob/develop-refactor/demo/eegraph_workflow.png)
-
-## Disclaimer
-* External dependency 'Entropy' can´t be installed with pip. The installation will happen when EEGraph is imported, a message will appear in the command line asking for permissions to install the missing dependency. 
-
-
-* There is a known issue with DTF connectivity, sometimes the error 'math domain error' is shown, it is part of an external library. 
+ 
+## Contributing
+See [Contribution guidelines](https://github.com/ufvceiec/EEGRAPH/blob/develop-refactor/CONTRIBUTING.md) for more information.
 
 ## Versioning
 See [CHANGELOG.txt](CHANGELOG.txt) for major/breaking updates and version history.
@@ -135,6 +132,12 @@ Centro de Estudios e Innovación en Gestión del Conocimiento (CEIEC), Universid
 * Supervisor: Ana María Maitín
 * Main developer: Pedro Chazarra
 
+## Disclaimer
+* External dependency 'Entropy' can´t be installed with pip. The installation will happen when EEGraph is imported, a message will appear in the command line asking for permissions to install the missing dependency. 
+
+
+* There is a known issue with DTF connectivity, sometimes the error 'math domain error' is shown, it is part of an external library.
+* 
 ## License
 
 This project is licensed under the MIT [License](https://github.com/ufvceiec/EEGRAPH/blob/develop-refactor/LICENSE).
