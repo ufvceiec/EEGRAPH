@@ -40,7 +40,7 @@ The documentation for EEGraph can be founde [here](https://github.com/ufvceiec/E
 Documentation related issues should be tagged with the `documentation` issue [label](https://github.com/ufvceiec/EEGRAPH/labels).
 
 ## :hammer_and_wrench: Submitting a pull request 
-**All New implementations** are welcome! New solutions for any problem. New frequency and time-frequency domain connectivity measures to modelate EEGs as graphs. Extensions of EEGraph current functionalities. Working on suggested features listed [here](https://github.com/ufvceiec/EEGRAPH/labels/enhancement%20%3Abulb%3A)...
+**All New implementations** are welcome! New solutions for any problem. New frequency and time-frequency domain connectivity measures to modelate EEGs as graphs. Extensions of EEGraph current functionalities. Working on suggested features listed [here](https://github.com/ufvceiec/EEGRAPH/labels/enhancement%20%3Abulb%3A). Fixing reported bugs listed [here](https://github.com/ufvceiec/EEGRAPH/labels/bug%20%3Abeetle%3A). 
 
 Please check wheter the solution is already implemented or not before sumbitting your pull request. If the change you want to introduce will require a significant amount of work to write, it is recommended to open an [issue](https://github.com/ufvceiec/EEGRAPH/issues) stating what you want to do. In this way you can have a conversation with other contributors that might help you have a better idea. 
 
