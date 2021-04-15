@@ -2,14 +2,16 @@ import numpy as np
 import pandas as pd
 from scipy import signal, stats
 from scipy.stats import entropy
+import subprocess
 from .tools import *
 from abc import ABC, abstractmethod
+
 
 #https://raphaelvallat.com/entropy/build/html/index.html
 try:
     from entropy import spectral_entropy
 except:
-    response = yes_or_no("Missing 'entropy' dependency...\nDo you want to install it?")
+    response = subprocess.run(yes_or_no("Missing 'entropy' dependency...\nDo you want to install it?"), timeout=10)
     if(response):
         print("Installing 'entropy'...")
         import sys
