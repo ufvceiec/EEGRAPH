@@ -137,7 +137,6 @@ Centro de Estudios e Innovación en Gestión del Conocimiento (CEIEC), Universid
 
 
 * There is a known issue with DTF connectivity, sometimes the error 'math domain error' is shown, it is part of an external library.
-* 
 ## License
 
 This project is licensed under the MIT [License](https://github.com/ufvceiec/EEGRAPH/blob/develop-refactor/LICENSE).
