@@ -1,4 +1,7 @@
-# EEGraph
+<p align="center">
+  <img src="https://github.com/ufvceiec/EEGRAPH/blob/develop-refactor/demo/eegraph-logo.png" alt="EEGraph Logo"/>
+</p>
+
 [![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/ufvceiec/EEGRAPH/blob/develop-refactor/LICENSE)
 [![Build Status](https://travis-ci.com/ufvceiec/EEGRAPH.svg?branch=develop-refactor)](https://travis-ci.com/ufvceiec/EEGRAPH)
 [![PyPI](https://img.shields.io/pypi/v/EEGRAPH?color=blue)](https://pypi.org/project/EEGRAPH/)
