@@ -2,22 +2,9 @@ import numpy as np
 import pandas as pd
 from scipy import signal, stats
 from scipy.stats import entropy
+import antropy as ant
 from .tools import *
 from abc import ABC, abstractmethod
-
-
-#https://raphaelvallat.com/entropy/build/html/index.html
-response = yes_or_no("Missing 'entropy' dependency...\nDo you want to install it?")
-if(response):
-    print("Installing 'entropy'...")
-    import sys
-    import subprocess
-    subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'git+https://github.com/raphaelvallat/entropy.git/'])
-    from entropy import spectral_entropy
-    print("Dependency 'entropy' installed.")
-else:
-    print("Connectivity Measure 'sprectal_entropy' will not be available.")
-
 
     
 class Strategy(ABC):
@@ -335,10 +322,10 @@ class Spectral_entropy_Estimator(Connectivity_single_channel_With_Bands):
     def __init__(self):
         self.threshold = None
         
-    #https://raphaelvallat.com/entropy/build/html/index.html
+    #https://raphaelvallat.com/antropy/build/html/generated/antropy.spectral_entropy.html#antropy.spectral_entropy
     def single_channel_conn(self, data, sample_rate):
         nperseg = len(data)
-        se = spectral_entropy(data, sample_rate, method='welch', nperseg = nperseg, normalize=True)
+        se = ant.spectral_entropy(data, sample_rate, method='welch', nperseg = nperseg, normalize=True)
         return se
     
 class Shannon_entropy_Estimator(Connectivity_single_channel_No_Bands):

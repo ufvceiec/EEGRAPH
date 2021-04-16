@@ -35,14 +35,6 @@ def re_scaling(raw_data):
 
     return scaled_data
 
-def yes_or_no(question):
-    reply = str(input(question+' (y/n): ') or "n").lower().strip()
-    if reply[0] == 'y':
-        return True
-    if reply[0] == 'n':
-        return False
-    else:
-        return yes_or_no("Uhhhh... please enter ")
 
 def process_channel_names(channel_names):
     """Process to obtain the electrode name from the channel name.
