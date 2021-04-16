@@ -3,5 +3,8 @@ python:
   - "3.8"
 install:
   - pip install -r requirements.txt
+  - pip install coverage
 script: 
-  - python -m unittest tests.tests_basic
+  - coverage run -m unittest tests.tests_basic
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
