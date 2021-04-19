@@ -140,7 +140,7 @@ def time_stamps(seconds, sample_rate, sample_length, sample_duration):
         samples_per_frame = (seconds * sample_rate)
         
         #Loop over, adding the samples per frame until it is bigger than the sample length. 
-        while i+samples_per_frame <= sample_length:    
+        while i+samples_per_frame < sample_length:    
             #Append the pair (Start, End) for the interval.
             intervals.append((i,i+samples_per_frame))
             #The End will be the Start for the next step. 

@@ -115,6 +115,24 @@ class TestTools(unittest.TestCase):
         with self.assertRaises(Exception):
             calculate_time_intervals(data, sample_rate, sample_duration, seconds, sample_length)
             
+            
+    def test_calculate_intervals_list_Exception_intervals_oneValue(self):
+        data = ([[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]])
+        sample_rate = 10
+        sample_duration = np.float64(3)
+        seconds = [1]
+        sample_length = 30
+        expected_result_data = [[1,2,3,4,5,6,7,8,9,10], [11,12,13,14,15,16,17,18,19,20], [21,22,23,24,25,26,27,28,29,30]]
+        expected_interval = [(0, 10), (10, 20), (20, 30)]
+        expected_flag = 0
+        
+        result = calculate_time_intervals(data, sample_rate, sample_duration, seconds, sample_length)
+        print(result)
+        for i, segment in enumerate(result[0]):
+            self.assertEqual(list(segment), expected_result_data[i])
+        self.assertEqual(result[1], expected_interval)
+        self.assertEqual(result[2], expected_flag)
+            
     #=================    
     #Frequency bands 
     
