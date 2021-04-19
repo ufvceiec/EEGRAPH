@@ -145,7 +145,7 @@ Centro de Estudios e Innovación en Gestión del Conocimiento (CEIEC), Universid
 
 ## License
 
-This project is licensed under the MIT [License](https://github.com/ufvceiec/EEGRAPH/blob/develop-refactor/LICENSE).
+This project is licensed under the [GPL-3.0 License](https://github.com/ufvceiec/EEGRAPH/blob/develop-refactor/LICENSE).
 
 
 
