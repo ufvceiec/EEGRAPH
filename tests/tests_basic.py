@@ -73,7 +73,7 @@ class TestTools(unittest.TestCase):
     def test_calculate_intervals_list_Exception_exceed_sample_length(self):
         data = ([[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]])
         sample_rate = 10
-        sample_duration = 2.5
+        sample_duration = np.float64(3)
         seconds = [0,3]
         sample_length = 29
         
@@ -84,7 +84,7 @@ class TestTools(unittest.TestCase):
     def test_calculate_intervals_list_Exception_intervals_not_starting_0(self):
         data = ([[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]])
         sample_rate = 10
-        sample_duration = 3
+        sample_duration = np.float64(3)
         seconds = [1, 2]
         sample_length = 29
         
