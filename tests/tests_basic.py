@@ -97,7 +97,7 @@ class TestTools(unittest.TestCase):
         bands= [True, False, True, False, True]
         result = calculate_bands_fft(values, sample_rate, bands)
         
-        self.assertTrue((result[0].mean() >= result[1].mean()) and (result[0].mean() >=  result[2].mean()))
+        self.assertTrue((result[0].mean() >=  result[2].mean()))
         
     def test_search_method(self):
         connectivity = 'cross_correlation'
