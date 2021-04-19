@@ -1,7 +1,8 @@
 import unittest
-import sys
-sys.path.append('..')
-import eegraph as eegraph
+from eegraph.graph import Graph
+from eegraph.importData import *
+from eegraph.modelateData import *
+from eegraph.strategy import *
 from eegraph.tools import *
 
 class TestTools(unittest.TestCase):
@@ -54,6 +55,7 @@ class TestTools(unittest.TestCase):
         result = calculate_time_intervals(data, sample_rate, sample_duration, seconds, sample_length)
         
         for i, segment in enumerate(result[0]):
+            print('seg1', segment)
             self.assertEqual(list(segment), expected_result_data[i])
         self.assertEqual(result[1], expected_interval)
         self.assertEqual(result[2], expected_flag)
@@ -125,6 +127,7 @@ class TestTools(unittest.TestCase):
         expected_flag = 0
         
         result = calculate_time_intervals(data, sample_rate, sample_duration, seconds, sample_length)
+        print(result)
         for i, segment in enumerate(result[0]):
             self.assertEqual(list(segment), expected_result_data[i])
         self.assertEqual(result[1], expected_interval)
@@ -135,11 +138,11 @@ class TestTools(unittest.TestCase):
     
     def test_calculate_bands_fft(self):
         values = np.random.uniform(0, 100, 2048)
-        sample_rate = 256 
+        sample_rate = 512 
         bands= [True, False, True, False, True]
         result = calculate_bands_fft(values, sample_rate, bands)
         
-        self.assertTrue(len(result[0]) < len(result[1] < len(result[2])))
+        self.assertTrue((result[0].mean() >=  result[2].mean()))
         
     def test_search_method(self):
         connectivity = 'cross_correlation'
@@ -152,45 +155,8 @@ class TestTools(unittest.TestCase):
         connectivity = 'cross_correlations'
         with self.assertRaises(NameError):
             search(connectivity_measures, connectivity)
-            
-            
-    #=================    
-    #Connectivity
+        
     
-    def test_calculate_connectivity(self):
-        data = [np.random.uniform(0, 100, 5),np.random.uniform(0, 100, 5),np.random.uniform(0, 100, 5),np.random.uniform(0, 100, 5)]
-        steps = [(0, 5)]
-        channels = 4
-        sample_rate = 1
-        connectivity = eegraph.strategy.Pearson_correlation_Estimator()
-        connectivity.flag = 0
-        
-        result = calculate_connectivity(data, steps, channels, sample_rate, connectivity)
-        self.assertTrue(len(result), 1)
-
-    def test_calculate_connectivity(self):
-        data = [np.random.uniform(0, 100, 5),np.random.uniform(0, 100, 5),np.random.uniform(0, 100, 5),np.random.uniform(0, 100, 5)]
-        steps = [(0, 5)]
-        channels = 4
-        sample_rate = 1
-        connectivity = eegraph.strategy.Pearson_correlation_Estimator()
-        connectivity.flag = 0
-        
-        result = calculate_connectivity(data, steps, channels, sample_rate, connectivity)
-        self.assertTrue(len(result[0]), 4)
-        
-    def test_calculate_connectivity_bands(self):
-        data = [np.random.uniform(0, 100, 5),np.random.uniform(0, 100, 5),np.random.uniform(0, 100, 5),np.random.uniform(0, 100, 5)]
-        bands= [True, True, True, True, True]
-        steps = [(0, 5)]
-        channels = 4
-        sample_rate = 1
-        connectivity = eegraph.strategy.Squared_coherence_Estimator()
-        connectivity.flag = 0
-        
-        result = calculate_connectivity_with_bands(data, steps, channels, sample_rate, connectivity, bands)
-        
-        self.assertTrue(len(result), 5)
         
         
 if __name__ == '__main__':
