@@ -148,7 +148,7 @@ def time_stamps(seconds, sample_rate, sample_length, sample_duration):
         
         #If the next time we add the samples per frame it is bigger than the sample length, append the remaining data points in a new interval. 
         #This new interval will not be the same size as the others. 
-        if(i+samples_per_frame > sample_length):
+        if(i+samples_per_frame >= sample_length):
             intervals.append((i,sample_length))
     
     #Round the intervals for the printed output
