@@ -158,9 +158,12 @@ class TestTools(unittest.TestCase):
     #Connectivity
     
     def test_calculate_connectivity(self):
-        data = [np.random.uniform(0, 100, 5),np.random.uniform(0, 100, 5),np.random.uniform(0, 100, 5),np.random.uniform(0, 100, 5)]
-        steps = [(0, 5)]
+        data = []
         channels = 4
+        for i in range(channels):
+            data.append(np.random.uniform(-0.5, 1, 2048))
+            
+        steps = [(0, 2048)]
         sample_rate = 1
         connectivity = eegraph.strategy.Pearson_correlation_Estimator()
         connectivity.flag = 0
@@ -170,11 +173,14 @@ class TestTools(unittest.TestCase):
         
         
     def test_calculate_connectivity__more_intervals(self):
-        data = [np.random.uniform(0, 100, 4),np.random.uniform(0, 100, 4),np.random.uniform(0, 100, 4),np.random.uniform(0, 100, 4),np.random.uniform(0, 100, 6), np.random.uniform(0, 100, 6), 
-               np.random.uniform(0, 100, 6), np.random.uniform(0, 100, 6)]
-        steps = [(0, 4), (4,10)]
+        data = []
         channels = 4
-        sample_rate = 2
+        intervals = 2
+        for i in range(channels * intervals):
+            data.append(np.random.uniform(-0.5, 1, 1024))
+            
+        steps = [(0, 1024), (1024, 2048)]
+        sample_rate = 512
         connectivity = eegraph.strategy.Pearson_correlation_Estimator()
         connectivity.flag = 0
         
@@ -182,12 +188,15 @@ class TestTools(unittest.TestCase):
         self.assertEqual(np.shape(result), (2,4,4))
         
     def test_calculate_connectivity_bands(self):
-        data = [np.random.uniform(0, 100, 10),np.random.uniform(0, 100, 10),np.random.uniform(0, 100, 10),np.random.uniform(0, 100, 10), np.random.uniform(0, 100, 10),np.random.uniform(0, 100, 10),
-                np.random.uniform(0, 100, 10),np.random.uniform(0, 100, 10), np.random.uniform(0, 100, 10),np.random.uniform(0, 100, 10),np.random.uniform(0, 100, 10),np.random.uniform(0, 100, 10)]
-        bands= [True, True, True, False, False]
-        steps = [(0, 10)]
+        data = []
         channels = 4
-        sample_rate = 1
+        for i in range(channels):
+            data.append(np.random.uniform(-0.5, 1, 1024))
+            
+        bands= [True, True, True, False, False]
+        steps = [(0, 2048)]
+        channels = 4
+        sample_rate =512
         connectivity = eegraph.strategy.Squared_coherence_Estimator()
         connectivity.flag = 0
         
@@ -195,17 +204,34 @@ class TestTools(unittest.TestCase):
         self.assertEqual(np.shape(result), (3,4,4))
         
     def test_calculate_connectivity_single_channel(self):
-        data = [np.random.uniform(0, 100, 5),np.random.uniform(0, 100, 5),np.random.uniform(0, 100, 5),np.random.uniform(0, 100, 5)]
-        steps = [(0, 5)]
+        data = []
         channels = 4
-        sample_rate = 1
+        for i in range(channels):
+            data.append(np.random.uniform(-0.5, 1, 2048))
+            
+        steps = [(0, 2048)]
+        sample_rate = 512
         connectivity = eegraph.strategy.Shannon_entropy_Estimator()
         connectivity.flag = 0
         
         result = calculate_connectivity_single_channel(data, sample_rate, connectivity)
         self.assertEqual(len(result), channels)  
 
+
+    def test_calculate_connectivity_single_channel_bands(self):
+        data = []
+        channels = 4
+        for i in range(channels):
+            data.append(np.random.uniform(-0.5, 1, 2048))
+            
+        steps = [(0, 2048)]
+        sample_rate = 512
+        bands= [True, True, False, True, False]
+        connectivity = eegraph.strategy.Shannon_entropy_Estimator()
+        connectivity.flag = 0
         
+        result = calculate_connectivity_single_channel_with_bands(data, sample_rate, connectivity, bands)
+        self.assertEqual(len(result), channels * sum(bands))  
         
 if __name__ == '__main__':
     unittest.main()
