@@ -277,7 +277,7 @@ class TestTools(unittest.TestCase):
         channels = 16
         data = []
         for i in range(channels):
-            data.append(np.random.uniform(-1, 1))
+            data.append(np.random.uniform(-100, 100))
         ch_names = ['Fp1', 'Fp2', 'AF7', 'AF3', 'AF4', 'AF8', 'F7', 'F5', 'F3', 'F1', 'Fz', 'F2', 'F4', 'F6', 'F8', 'FT9']
         expected_edges = 6 #All edges between top 25% nodes. 16 channels -> 4 nodes with connections. All 4 nodes interconnected -> 6 edges in total. 
         
