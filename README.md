@@ -15,9 +15,9 @@ in the study of neurologic diseases like Parkinson or epilepsy. The graph can be
 ## Getting Started
 
 
-### Prerequisites
+### Dependencies
 
-What libraries you need to install.
+What libraries does EEGraph use.
 
 * Numpy
 * Pandas
