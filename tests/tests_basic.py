@@ -277,7 +277,7 @@ class TestTools(unittest.TestCase):
         channels = 16
         data = []
         for i in range(channels):
-            data.append(np.random.uniform(-0.5, 1))
+            data.append(np.random.uniform(-1, 1))
         ch_names = ['Fp1', 'Fp2', 'AF7', 'AF3', 'AF4', 'AF8', 'F7', 'F5', 'F3', 'F1', 'Fz', 'F2', 'F4', 'F6', 'F8', 'FT9']
         expected_edges = 6 #All edges between top 25% nodes. 16 channels -> 4 nodes with connections. All 4 nodes interconnected -> 6 edges in total. 
         
@@ -285,6 +285,17 @@ class TestTools(unittest.TestCase):
         self.assertEqual(len(result[0].nodes()), channels)
         self.assertEqual(len(result[0].edges()), expected_edges)
     
+    def test_draw_graph(self):
+        G1 = nx.Graph()
+        nodes_list = ['Fp1', 'Fp2', 'AF7', 'AF3', 'AF4', 'AF8', 'F7', 'F5', 'F3', 'F1', 'Fz', 'F2', 'F4', 'F6', 'F8', 'FT9']
+        edges_list = [('Fp1', 'Fp2'), ('Fp1', 'AF3'), ('Fp1', 'F7'), ('AF7', 'AF3'), ('AF8', 'F7')]
+        G1.add_nodes_from(nodes_list)
+        for pair in edges_list:
+            G1.add_edge(pair[0], pair[1], weight=1, thickness=1)
+    
+        
+        draw_graph(G1, False, False)
+        
     
 if __name__ == '__main__':
     unittest.main()
