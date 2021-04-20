@@ -160,16 +160,17 @@ class TestTools(unittest.TestCase):
     def test_calculate_connectivity(self):
         data = []
         channels = 4
-        for i in range(channels):
+        intervals = 1
+        for i in range(channels * intervals):
             data.append(np.random.uniform(-0.5, 1, 2048))
             
         steps = [(0, 2048)]
-        sample_rate = 1
+        sample_rate = 512
         connectivity = eegraph.strategy.Pearson_correlation_Estimator()
         connectivity.flag = 0
         
         result = calculate_connectivity(data, steps, channels, sample_rate, connectivity)
-        self.assertEqual(np.shape(result), (1,4,4))
+        self.assertEqual(np.shape(result), (intervals,channels,channels))
         
         
     def test_calculate_connectivity__more_intervals(self):
@@ -185,12 +186,13 @@ class TestTools(unittest.TestCase):
         connectivity.flag = 0
         
         result = calculate_connectivity(data, steps, channels, sample_rate, connectivity)
-        self.assertEqual(np.shape(result), (2,4,4))
+        self.assertEqual(np.shape(result), (intervals,channels,channels))
         
     def test_calculate_connectivity_bands(self):
         data = []
         channels = 4
-        for i in range(channels):
+        intervals = 1
+        for i in range(channels * intervals):
             data.append(np.random.uniform(-0.5, 1, 1024))
             
         bands= [True, True, True, False, False]
@@ -201,12 +203,28 @@ class TestTools(unittest.TestCase):
         connectivity.flag = 0
         
         result = calculate_connectivity_with_bands(data, steps, channels, sample_rate, connectivity, bands)
-        self.assertEqual(np.shape(result), (3,4,4))
+        self.assertEqual(np.shape(result), (sum(bands),channels,channels))
+        
+    def test_calculate_dtf(self):
+        data = []
+        channels = 16
+        intervals = 1
+        for i in range(channels * intervals):
+            data.append(np.random.uniform(0, 1, 2048))
+            
+        steps = [(0, 2048)]
+        sample_rate = 512
+        bands= [True, True, False, True, False]
+        flag=0
+        
+        result = calculate_dtf(data, steps, channels, sample_rate, bands, flag)
+        self.assertEqual(np.shape(result), (sum(bands),channels,channels))
         
     def test_calculate_connectivity_single_channel(self):
         data = []
         channels = 4
-        for i in range(channels):
+        intervals = 1
+        for i in range(channels * intervals):
             data.append(np.random.uniform(-0.5, 1, 2048))
             
         steps = [(0, 2048)]
@@ -221,7 +239,8 @@ class TestTools(unittest.TestCase):
     def test_calculate_connectivity_single_channel_bands(self):
         data = []
         channels = 4
-        for i in range(channels):
+        intervals = 1
+        for i in range(channels * intervals):
             data.append(np.random.uniform(-0.5, 1, 2048))
             
         steps = [(0, 2048)]
@@ -233,5 +252,39 @@ class TestTools(unittest.TestCase):
         result = calculate_connectivity_single_channel_with_bands(data, sample_rate, connectivity, bands)
         self.assertEqual(len(result), channels * sum(bands))  
         
+        
+        
+    #=================    
+    #Graphs      
+        
+    def test_make_graph(self):
+        channels = 4
+        data = np.zeros(shape=(channels,channels))
+        matrix = [data]
+        matrix[0][0] = [1,0,0.8,0.4]
+        matrix[0][1] = [0.8,1,0.3,0]
+        matrix[0][2] = [0.2,0.9,1,0]
+        matrix[0][3] = [0.1,0.2,0.5,1]
+        ch_names = ['Fp1', 'Fp2', 'AF7', 'AF3']
+        threshold = 0.7
+        expected_edges = 3
+        
+        result = make_graph(matrix, ch_names, threshold)
+        self.assertEqual(len(result[0].nodes()), channels)
+        self.assertEqual(len(result[0].edges()), expected_edges)
+        
+    def test_make_single_channel_graph(self):
+        channels = 16
+        data = []
+        for i in range(channels):
+            data.append(np.random.uniform(-0.5, 1))
+        ch_names = ['Fp1', 'Fp2', 'AF7', 'AF3', 'AF4', 'AF8', 'F7', 'F5', 'F3', 'F1', 'Fz', 'F2', 'F4', 'F6', 'F8', 'FT9']
+        expected_edges = 6 #All edges between top 25% nodes. 16 channels -> 4 nodes with connections. All 4 nodes interconnected -> 6 edges in total. 
+        
+        result = single_channel_graph(data, ch_names, channels)
+        self.assertEqual(len(result[0].nodes()), channels)
+        self.assertEqual(len(result[0].edges()), expected_edges)
+    
+    
 if __name__ == '__main__':
     unittest.main()
