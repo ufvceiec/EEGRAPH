@@ -277,9 +277,9 @@ class TestTools(unittest.TestCase):
         
     def test_make_single_channel_graph(self):
         channels = 16
-        data = []
-        for i in range(channels):
-            data.append(np.random.uniform(-1000, 1000, 1))
+        data = [([0.54337644]), ([-0.85042714]), ([-0.63641063]), ([0.02879978]), ([0.97642451]), ([0.47373244]), ([-0.13785667]), ([-0.19336038]), ([0.55023686]), ([-0.05053916]), ([0.34913885]), 
+                ([-0.10666878]), ([0.94642219]), ([0.20702023]), ([-0.16919901]), ([-0.17072353])]
+        
         ch_names = ['Fp1', 'Fp2', 'AF7', 'AF3', 'AF4', 'AF8', 'F7', 'F5', 'F3', 'F1', 'Fz', 'F2', 'F4', 'F6', 'F8', 'FT9']
         expected_edges = 6 #All edges between top 25% nodes. 16 channels -> 4 nodes with connections. All 4 nodes interconnected -> 6 edges in total. 
         
