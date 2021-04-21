@@ -4,7 +4,6 @@ sys.path.append('..')
 import eegraph as eegraph
 from eegraph.tools import *
 
-from eegraph import graph
 
 class TestTools(unittest.TestCase):
     connectivity_measures = {'cross_correlation': 'Cross_correlation_Estimator', 'pearson_correlation': 'Pearson_correlation_Estimator', 'squared_coherence': 'Squared_coherence_Estimator',
@@ -312,9 +311,12 @@ class TestTools(unittest.TestCase):
 class TestImportData(unittest.TestCase):
     
     def test_load_data(self):
-        path = 'file.edf'
+        path = 'CHB-MIT/chb02_16.edf'                               #Public EEG dataset. https://physionet.org/content/chbmit/1.0.0/
+        channels = 23
         
-        graph.load_data = (path)
+        G = eegraph.Graph()
+        G.load_data = (path)
+        
     
     
 if __name__ == '__main__':
