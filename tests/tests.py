@@ -4,6 +4,8 @@ sys.path.append('..')
 import eegraph as eegraph
 from eegraph.tools import *
 
+from eegraph import graph
+
 class TestTools(unittest.TestCase):
     connectivity_measures = {'cross_correlation': 'Cross_correlation_Estimator', 'pearson_correlation': 'Pearson_correlation_Estimator', 'squared_coherence': 'Squared_coherence_Estimator',
                          'imag_coherence': 'Imag_coherence_Estimator', 'corr_cross_correlation': 'Corr_cross_correlation_Estimator', 'wpli': 'Wpli_Estimator', 
@@ -191,19 +193,19 @@ class TestTools(unittest.TestCase):
     def test_calculate_connectivity_bands(self):
         data = []
         channels = 4
-        intervals = 1
+        intervals = 2
         for i in range(channels * intervals):
             data.append(np.random.uniform(-0.5, 1, 1024))
             
         bands= [True, True, True, False, False]
-        steps = [(0, 2048)]
+        steps = [(0, 1024), (1024, 2048)]
         channels = 4
         sample_rate =512
-        connectivity = eegraph.strategy.Squared_coherence_Estimator()
+        connectivity = eegraph.strategy.Pli_Bands_Estimator()
         connectivity.flag = 0
         
         result = calculate_connectivity_with_bands(data, steps, channels, sample_rate, connectivity, bands)
-        self.assertEqual(np.shape(result), (sum(bands),channels,channels))
+        self.assertEqual(np.shape(result), (sum(bands)*intervals,channels,channels))
         
     def test_calculate_dtf(self):
         data = []
@@ -246,7 +248,7 @@ class TestTools(unittest.TestCase):
         steps = [(0, 2048)]
         sample_rate = 512
         bands= [True, True, False, True, False]
-        connectivity = eegraph.strategy.Shannon_entropy_Estimator()
+        connectivity = eegraph.strategy.Spectral_entropy_Estimator()
         connectivity.flag = 0
         
         result = calculate_connectivity_single_channel_with_bands(data, sample_rate, connectivity, bands)
@@ -277,7 +279,7 @@ class TestTools(unittest.TestCase):
         channels = 16
         data = []
         for i in range(channels):
-            data.append(np.random.uniform(-100, 100))
+            data.append(np.random.uniform(-1000, 1000, 1))
         ch_names = ['Fp1', 'Fp2', 'AF7', 'AF3', 'AF4', 'AF8', 'F7', 'F5', 'F3', 'F1', 'Fz', 'F2', 'F4', 'F6', 'F8', 'FT9']
         expected_edges = 6 #All edges between top 25% nodes. 16 channels -> 4 nodes with connections. All 4 nodes interconnected -> 6 edges in total. 
         
@@ -293,9 +295,27 @@ class TestTools(unittest.TestCase):
         for pair in edges_list:
             G1.add_edge(pair[0], pair[1], weight=1, thickness=1)
     
+        self.assertTrue(draw_graph(G1, False, False))
         
-        draw_graph(G1, False, False)
+    def test_draw_graph_unkown_node(self):
+        G1 = nx.Graph()
+        nodes_list = ['Fp1', 'Fp2', 'AF7', 'AF3', 'AF4', 'AF8', 'XX', 'F5', 'F3', 'F1', 'Fz', 'F2', 'F4', 'F6', 'F8', 'FT9']
+        edges_list = [('Fp1', 'Fp2'), ('Fp1', 'AF3'), ('Fp1', 'F7'), ('AF7', 'AF3'), ('AF8', 'F7')]
+        G1.add_nodes_from(nodes_list)
+        for pair in edges_list:
+            G1.add_edge(pair[0], pair[1], weight=1, thickness=1)
+    
+        with self.assertWarns(Warning):
+            draw_graph(G1, True, True)
+    
+
+class TestImportData(unittest.TestCase):
+    
+    def test_load_data(self):
+        path = 'file.edf'
         
+        graph.load_data = (path)
+    
     
 if __name__ == '__main__':
     unittest.main()
