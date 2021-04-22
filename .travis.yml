@@ -4,6 +4,10 @@ os:
 python:
   - "3.7"
   - "3.8"
+before_install:
+  - cp tests/.chb02_16.edf .chb02_16.edf
+  - cp tests/.test_eeg.gdf .test_eeg.gdf
+  - cp tests/.electrodemontage.set.ced .electrodemontage.set.ced
 install:
   - pip install -r requirements.txt
   - pip install coverage
