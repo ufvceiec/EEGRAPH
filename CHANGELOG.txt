@@ -1,7 +1,7 @@
 Change Log
 ==========
 
-0.1.7 (04/22/2021)
+0.1.7 (05/22/2021)
 ------------------
 - Updating Entropy depedency to Antropy, all dependencies are now installed with pip. 
 
