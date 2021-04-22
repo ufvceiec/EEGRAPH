@@ -1,5 +1,5 @@
 .ipynb_checkpoints
 __pycache__
-.edf
-.gdf
-.set.ced
+.chb02_16.edf
+.test_eeg.gdf
+.electrodemontage.set.ced
