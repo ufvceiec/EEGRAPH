@@ -307,7 +307,7 @@ class TestTools(unittest.TestCase):
 class TestImportData(unittest.TestCase):
     
     def test_load_data(self):
-        path = 'tests/.chb02_16.edf'                               #Public EEG dataset. https://physionet.org/content/chbmit/1.0.0/
+        path = '.chb02_16.edf'                               #Public EEG dataset. https://physionet.org/content/chbmit/1.0.0/
         channels = 23
         expected_ch_names = ['FP1-F7', 'F7-T7', 'T7-P7', 'P7-O1', 'FP1-F3', 'F3-C3', 'C3-P3', 'P3-O1', 'FP2-F4', 'F4-C4', 'C4-P4', 'P4-O2', 'FP2-F8', 'F8-T8', 'T8-P8-0', 'P8-O2', 'FZ-CZ', 'CZ-PZ', 'P7-T7', 
                            'T7-FT9', 'FT9-FT10', 'FT10-T8', 'T8-P8-1']
@@ -318,8 +318,8 @@ class TestImportData(unittest.TestCase):
         self.assertEqual(G.ch_names, expected_ch_names)
         
     def test_load_data_electrode_montage(self):
-        path = 'tests/.test_eeg.gdf'                               
-        electrode_montage_path = 'tests/.electrodemontage.set.ced'
+        path = '.test_eeg.gdf'                               
+        electrode_montage_path = '.electrodemontage.set.ced'
         expected_ch_names = ['Fp1', 'Fp2', 'AF7', 'AF3', 'AF4', 'AF8', 'F7', 'F5', 'F3', 'F1', 'Fz', 'F2', 'F4', 'F6', 'F8', 'FT9', 'FT7', 'FC5', 'FC3', 'FC1', 'FCz', 'FC2', 'FC4', 'FC6', 'FT8', 'FT10', 'T7', 
                              'C5', 'C3', 'C1', 'Cz', 'C2', 'C4', 'C6', 'T8', 'TP9', 'TP7', 'CP5', 'CP3', 'CP1', 'CPz', 'CP2', 'CP4', 'CP6', 'TP8', 'TP10', 'P7', 'P5', 'P3', 'P1', 'Pz', 'P2', 'P4', 'P6', 'P8', 
                              'PO7', 'PO3', 'POz', 'PO4', 'PO8', 'PO9', 'O1', 'Oz', 'O2']         #Labels in electrode montage file
@@ -334,7 +334,7 @@ class TestImportData(unittest.TestCase):
 class TestModelData(unittest.TestCase):
     
     def setUp(self):
-        path = 'tests/.test_eeg.gdf'
+        path = '.test_eeg.gdf'
         self.window_size = 5
         self.G = eegraph.Graph()
         self.G.load_data(path)
