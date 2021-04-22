@@ -6,10 +6,6 @@ from eegraph.tools import *
 
 
 class TestTools(unittest.TestCase):
-    connectivity_measures = {'cross_correlation': 'Cross_correlation_Estimator', 'pearson_correlation': 'Pearson_correlation_Estimator', 'squared_coherence': 'Squared_coherence_Estimator',
-                         'imag_coherence': 'Imag_coherence_Estimator', 'corr_cross_correlation': 'Corr_cross_correlation_Estimator', 'wpli': 'Wpli_Estimator', 
-                         'plv': 'Plv_Estimator', 'pli': 'Pli_No_Bands_Estimator', 'pli_bands': 'Pli_Bands_Estimator', 'dtf': 'Dtf_Estimator', 'power_spectrum': 'Power_spectrum_Estimator',
-                         'spectral_entropy': 'Spectral_entropy_Estimator', 'shannon_entropy': 'Shannon_entropy_Estimator'}
     
     def test_processed_input_bands(self):
         frequency_bands = ['delta', 'thet', 'alpha', 'betah', 'gamma']
@@ -323,7 +319,7 @@ class TestImportData(unittest.TestCase):
         
     def test_load_data_electrode_montage(self):
         path = 'tests/Test_files/test_eeg.gdf'                               
-        electrode_montage_path = "tests/Test_files/electrodemontage.set.ced"
+        electrode_montage_path = 'tests/Test_files/electrodemontage.set.ced'
         expected_ch_names = ['Fp1', 'Fp2', 'AF7', 'AF3', 'AF4', 'AF8', 'F7', 'F5', 'F3', 'F1', 'Fz', 'F2', 'F4', 'F6', 'F8', 'FT9', 'FT7', 'FC5', 'FC3', 'FC1', 'FCz', 'FC2', 'FC4', 'FC6', 'FT8', 'FT10', 'T7', 
                              'C5', 'C3', 'C1', 'Cz', 'C2', 'C4', 'C6', 'T8', 'TP9', 'TP7', 'CP5', 'CP3', 'CP1', 'CPz', 'CP2', 'CP4', 'CP6', 'TP8', 'TP10', 'P7', 'P5', 'P3', 'P1', 'Pz', 'P2', 'P4', 'P6', 'P8', 
                              'PO7', 'PO3', 'POz', 'PO4', 'PO8', 'PO9', 'O1', 'Oz', 'O2']         #Labels in electrode montage file
@@ -335,7 +331,42 @@ class TestImportData(unittest.TestCase):
         self.assertEqual(len(G.ch_names), channels)
         self.assertEqual(G.ch_names, expected_ch_names)
 
+class TestModelData(unittest.TestCase):
     
+    def setUp(self):
+        path = 'tests/Test_files/test_eeg.gdf'
+        self.window_size = 5
+        self.G = eegraph.Graph()
+        self.G.load_data(path)
+    
+    def test_modelate_no_bands(self):
+        connectivity = 'cross_correlation'
+        expected_graphs = 7    #32 secs / 5 = 6.4 -> 7
+        
+        graphs, _ = self.G.modelate(window_size = self.window_size, connectivity = connectivity)
+        self.assertEqual(len(graphs), expected_graphs)
+        
+    def test_modelate_bands(self):
+        connectivity = 'imag_coherence'
+        bands = ['delta','theta','alpha','beta','gamma']
+        expected_graphs = 7 * 5    #32 secs / 5 = 6.4 -> 7 * 5 frequency bands. 
+        
+        graphs, _ = self.G.modelate(window_size = self.window_size, connectivity = connectivity, bands=bands)
+        self.assertEqual(len(graphs), expected_graphs)
+        
+    def test_modelate_need_bands_error(self):
+        connectivity = 'imag_coherence'
+        
+        with self.assertRaises(NameError):
+            graphs, _ = self.G.modelate(window_size = self.window_size, connectivity = connectivity)
+            
+    def test_modelate_dont_need_bands_error(self):
+        connectivity = 'cross_correlation'
+        bands = ['delta','theta','alpha','beta','gamma']
+        
+        with self.assertRaises(NameError):
+            graphs, _ = self.G.modelate(window_size = self.window_size, connectivity = connectivity, bands=bands)
+        
     
 if __name__ == '__main__':
     unittest.main()
