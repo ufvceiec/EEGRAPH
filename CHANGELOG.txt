@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+0.1.7 (04/22/2021)
+------------------
+- Updating Entropy depedency to Antropy, all dependencies are now installed with pip. 
+
 0.1.6 (03/25/2021)
 ------------------
 - Adding the option to include a electrode montage file for channel labels, in method load_data(). 
