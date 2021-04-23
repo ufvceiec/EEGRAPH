@@ -246,11 +246,11 @@ class Plv_Estimator(Connectivity_With_Bands):
         sig1_bands = instantaneous_phase([sig1_delta, sig1_theta, sig1_alpha, sig1_beta, sig1_gamma])
         sig2_bands = instantaneous_phase([sig2_delta, sig2_theta, sig2_alpha, sig2_beta, sig2_gamma])
         
-        complex_phase_diff_delta = np.exp(np.complex(0,1)*(sig1_bands[0] - sig2_bands[0]))
-        complex_phase_diff_theta = np.exp(np.complex(0,1)*(sig1_bands[1] - sig2_bands[1]))
-        complex_phase_diff_alpha = np.exp(np.complex(0,1)*(sig1_bands[2] - sig2_bands[2]))
-        complex_phase_diff_beta = np.exp(np.complex(0,1)*(sig1_bands[3] - sig2_bands[3]))
-        complex_phase_diff_gamma = np.exp(np.complex(0,1)*(sig1_bands[4] - sig2_bands[4]))
+        complex_phase_diff_delta = np.exp(complex(0,1)*(sig1_bands[0] - sig2_bands[0]))
+        complex_phase_diff_theta = np.exp(complex(0,1)*(sig1_bands[1] - sig2_bands[1]))
+        complex_phase_diff_alpha = np.exp(complex(0,1)*(sig1_bands[2] - sig2_bands[2]))
+        complex_phase_diff_beta = np.exp(complex(0,1)*(sig1_bands[3] - sig2_bands[3]))
+        complex_phase_diff_gamma = np.exp(complex(0,1)*(sig1_bands[4] - sig2_bands[4]))
         
         plv_delta = np.abs(np.sum(complex_phase_diff_delta))/len(sig1_bands[0])
         plv_theta = np.abs(np.sum(complex_phase_diff_theta))/len(sig1_bands[1])
