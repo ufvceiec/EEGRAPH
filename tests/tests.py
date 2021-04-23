@@ -380,6 +380,14 @@ class TestVisualizeData(unittest.TestCase):
         f = open(expexted_html_file_path)
         self.assertTrue(f)
         f.close()
+
+    def test_visualize_channel_warning(self):
+        G = eegraph.Graph()
+        G.load_data('.test_eeg.gdf')
+        graphs, _ = G.modelate(window_size = 10, connectivity = 'plv', bands = ['theta','alpha','beta'])
+        
+        with self.assertWarns(Warning):
+            G.visualize(graphs[0], 'test_2')
     
 if __name__ == '__main__':
     unittest.main()

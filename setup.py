@@ -5,7 +5,7 @@ classifiers = [
     'Development Status :: 5 - Production/Stable',
     'Inteded Audience :: Research',
     'Operating System :: Microsoft :: Windows :: Windows 10',
-    'License :: OSI Approved :: MIT License',
+    'License :: OSI Approved :: GPL-3.0 License',
     'Programming Language :: Python :: 3'
 ]
 
