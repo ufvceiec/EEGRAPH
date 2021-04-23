@@ -4,6 +4,7 @@ Change Log
 0.1.7 (05/22/2021)
 ------------------
 - Updating Entropy depedency to Antropy, all dependencies are now installed with pip. 
+- Updating np.complex to complex, deprecation warning numpy 1.20.
 
 0.1.6 (03/25/2021)
 ------------------
