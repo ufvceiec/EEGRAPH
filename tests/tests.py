@@ -179,7 +179,7 @@ class TestTools(unittest.TestCase):
             
         steps = [(0, 1024), (1024, 2048)]
         sample_rate = 512
-        connectivity = eegraph.strategy.Pearson_correlation_Estimator()
+        connectivity = eegraph.strategy.Cross_correlation_Estimator()
         connectivity.flag = 0
         
         result = calculate_connectivity(data, steps, channels, sample_rate, connectivity)
@@ -340,7 +340,7 @@ class TestModelData(unittest.TestCase):
         self.G.load_data(path)
     
     def test_modelate_no_bands(self):
-        connectivity = 'cross_correlation'
+        connectivity = 'corr_cross_correlation'
         expected_graphs = 7    #32 secs / 5 = 6.4 -> 7
         
         graphs, _ = self.G.modelate(window_size = self.window_size, connectivity = connectivity)
@@ -367,6 +367,19 @@ class TestModelData(unittest.TestCase):
         with self.assertRaises(NameError):
             graphs, _ = self.G.modelate(window_size = self.window_size, connectivity = connectivity, bands=bands)
         
+        
+class TestVisualizeData(unittest.TestCase):
+    
+    def test_visualize(self):
+        G = eegraph.Graph()
+        G.load_data('.test_eeg.gdf', electrode_montage_path = '.electrodemontage.set.ced')
+        graphs, _ = G.modelate(window_size = 10, connectivity = 'wpli', threshold=0.9, bands = ['theta','alpha','beta'])
+        G.visualize(graphs[0], 'test_1')
+
+        expexted_html_file_path = 'test_1_plot.html'
+        f = open(expexted_html_file_path)
+        self.assertTrue(f)
+        f.close()
     
 if __name__ == '__main__':
     unittest.main()
