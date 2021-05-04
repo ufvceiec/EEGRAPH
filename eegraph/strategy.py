@@ -162,9 +162,9 @@ class Imag_coherence_Estimator(Connectivity_With_Bands):
         
         return delta.mean(), theta.mean(), alpha.mean(), beta.mean(), gamma.mean()
     
-class Corr_cross_correlation_Estimator(Connectivity_No_Bands):
+class Corr_cross_correlation_Estimator(Cross_correlation_rescaled):
     def __init__(self):
-        self.threshold = 0.3
+        self.threshold = 0.1
         
     def calculate_conn(self, data_intervals, i, j, sample_rate, channels):
         x = data_intervals[i]
@@ -186,7 +186,8 @@ class Corr_cross_correlation_Estimator(Connectivity_No_Bands):
         
         corCC = positive_lag - negative_lag
         
-        disp = round((len(data_intervals[i])) * 0.15)
+        #We use the mean from lag 0 to a 10% displacement. 
+        disp = round((len(data_intervals[i])) * 0.10)
         
         corCC_coef = corCC[:disp].mean()
         
