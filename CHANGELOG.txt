@@ -1,7 +1,12 @@
 Change Log
 ==========
 
-0.1.7 (05/22/2021)
+0.1.8 (05/04/2021)
+------------------
+- Updating Corrected cross-correlation default threshold.
+- Rescaling data for Corrected cross-correlation. 
+
+0.1.7 (04/22/2021)
 ------------------
 - Updating Entropy depedency to Antropy, all dependencies are now installed with pip. 
 - Updating np.complex to complex, deprecation warning numpy 1.20.
