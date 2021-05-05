@@ -94,7 +94,7 @@ class Dtf_With_Bands(Strategy):
         return self.connectivity_matrix
 
     def make_graph_workflow(self, data):
-        G = make_graph(self.connectivity_matrix, data.ch_names, data.threshold)
+        G = make_graph(self.connectivity_matrix, data.ch_names, data.threshold, True)
     
         return G    
         
