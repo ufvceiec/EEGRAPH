@@ -458,10 +458,11 @@ def make_graph(matrix, ch_names, threshold):
     
     return G        
 
-def single_channel_graph(data, ch_names, channels, bands=None):     
+def single_channel_graph(data, ch_names, channels, percentage_threshold, bands=None):     
     num_graphs = int(len(data)/channels)
     print("Number of graphs created:", num_graphs)
     nodes = process_channel_names(ch_names)
+    percentile = 100 - (percentage_threshold*100)
     
     G = {}
     for i in range(num_graphs):
@@ -469,8 +470,8 @@ def single_channel_graph(data, ch_names, channels, bands=None):
         G[i].add_nodes_from(nodes, values=5)
         elegible_nodes = []
         
-        #Calculate the 75th percentile of the channels
-        threshold = np.percentile(data[(i*channels):(((i+1)*channels)-1)], 75)
+        #Calculate the percentile of top channels channels for given percentage
+        threshold = np.percentile(data[(i*channels):(((i+1)*channels)-1)], percentile)
 
 
         for j in range(channels):

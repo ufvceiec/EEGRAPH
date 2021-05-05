@@ -54,7 +54,7 @@ class Connectivity_single_channel_With_Bands(Strategy):
         return self.connectivity_matrix
 
     def make_graph_workflow(self, data):
-        G = single_channel_graph(self.connectivity_matrix, data.ch_names, data.num_channels, self.bands)
+        G = single_channel_graph(self.connectivity_matrix, data.ch_names, data.num_channels, data.threshold, self.bands)
     
         return G
     
@@ -67,7 +67,7 @@ class Connectivity_single_channel_No_Bands(Strategy):
         return self.connectivity_matrix
 
     def make_graph_workflow(self, data):
-        G = single_channel_graph(self.connectivity_matrix, data.ch_names, data.num_channels)
+        G = single_channel_graph(self.connectivity_matrix, data.ch_names, data.num_channels, data.threshold)
     
         return G
     
@@ -310,7 +310,7 @@ class Pli_No_Bands_Estimator(Connectivity_No_Bands):
     
 class Power_spectrum_Estimator(Connectivity_single_channel_With_Bands):
     def __init__(self):
-        self.threshold = None
+        self.threshold = 0.25            #<----- 25%
         
     #https://www.kite.com/python/answers/how-to-plot-a-power-spectrum-in-python
     def single_channel_conn(self, data, sample_rate):
@@ -321,7 +321,7 @@ class Power_spectrum_Estimator(Connectivity_single_channel_With_Bands):
     
 class Spectral_entropy_Estimator(Connectivity_single_channel_With_Bands):
     def __init__(self):
-        self.threshold = None
+        self.threshold = 0.25            #<----- 25%
         
     #https://raphaelvallat.com/antropy/build/html/generated/antropy.spectral_entropy.html#antropy.spectral_entropy
     def single_channel_conn(self, data, sample_rate):
@@ -331,7 +331,7 @@ class Spectral_entropy_Estimator(Connectivity_single_channel_With_Bands):
     
 class Shannon_entropy_Estimator(Connectivity_single_channel_No_Bands):
     def __init__(self):
-        self.threshold = None
+        self.threshold = 0.25            #<----- 25%
         
     #https://www.kite.com/python/answers/how-to-calculate-shannon-entropy-in-python
     def single_channel_conn(self, data, sample_rate):
