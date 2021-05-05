@@ -20,7 +20,7 @@ connectivity_measures = {'cross_correlation': 'Cross_correlation_Estimator', 'pe
 def search_input(values, searchFor):
     for k in values:
         if (searchFor == k):
-            print(values[k])
+            return values[k]
     raise NameError('File extension ' + "'" + searchFor + "'" + ' is not supported.')
     
 def search(values, searchFor):
