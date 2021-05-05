@@ -8,11 +8,21 @@ import plotly.graph_objects as go
 import logging
 import warnings
 
+input_format = {'edf': 'mne.io.read_raw_edf(self.path, exclude= self.exclude)', 'gdf': 'mne.io.read_raw_gdf(self.path, exclude= self.exclude)', 'vhdr': 'mne.io.read_raw_brainvision(self.path, exclude= self.exclude)',
+               'cnt': 'mne.io.read_raw_cnt(self.path, exclude= self.exclude)', 'bdf': 'mne.io.read_raw_edf(self.path, exclude= self.exclude)', 'egi': 'mne.io.read_raw_egi(self.path, exclude= self.exclude)', 
+                'mff': 'mne.io.read_raw_egi(self.path, exclude= self.exclude)', 'nxe': 'mne.io.read_raw_eximia(self.path, exclude= self.exclude)'}
+
 connectivity_measures = {'cross_correlation': 'Cross_correlation_Estimator', 'pearson_correlation': 'Pearson_correlation_Estimator', 'squared_coherence': 'Squared_coherence_Estimator',
                          'imag_coherence': 'Imag_coherence_Estimator', 'corr_cross_correlation': 'Corr_cross_correlation_Estimator', 'wpli': 'Wpli_Estimator', 
                          'plv': 'Plv_Estimator', 'pli': 'Pli_No_Bands_Estimator', 'pli_bands': 'Pli_Bands_Estimator', 'dtf': 'Dtf_Estimator', 'power_spectrum': 'Power_spectrum_Estimator',
                          'spectral_entropy': 'Spectral_entropy_Estimator', 'shannon_entropy': 'Shannon_entropy_Estimator'}
 
+def search_input(values, searchFor):
+    for k in values:
+        if (searchFor == k):
+            print(values[k])
+    raise NameError('File extension ' + "'" + searchFor + "'" + ' is not supported.')
+    
 def search(values, searchFor):
     for k in values:
         if (searchFor == k):
