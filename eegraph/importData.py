@@ -1,6 +1,6 @@
 import mne
 import pandas as pd
-from .tools import process_channel_names
+from .tools import process_channel_names, search_input, input_format
     
 class InputData:
     def __init__(self, path, exclude):
@@ -12,23 +12,8 @@ class InputData:
         file_type = self.path.split(".")
 
         #https://mne.tools/0.17/manual/io.html
-        #Check the extension of the file, and read it accordingly. 
-        if(file_type[-1] == 'edf'):
-            self.data = mne.io.read_raw_edf(self.path, exclude= self.exclude)
-        elif(file_type[-1] == 'gdf'):
-            self.data = mne.io.read_raw_gdf(self.path, exclude= self.exclude)
-        elif(file_type[-1] == 'vhdr'):
-            self.data = mne.io.read_raw_brainvision(self.path, exclude= self.exclude)
-        elif(file_type[-1] == 'cnt'):
-            self.data = mne.io.read_raw_cnt(self.path, exclude= self.exclude)   
-        elif(file_type[-1] == 'bdf'):
-            self.data = mne.io.read_raw_edf(self.path, exclude= self.exclude)
-        elif(file_type[-1] == 'egi'):
-            self.data = mne.io.read_raw_egi(self.path, exclude= self.exclude)
-        elif(file_type[-1] == 'mff'):
-            self.data = mne.io.read_raw_egi(self.path, exclude= self.exclude)
-        elif(file_type[-1] == 'nxe'):
-            self.data = mne.io.read_raw_eximia(self.path, exclude= self.exclude)
+        #Check the extension of the file in the input format dictionary, and use the proper MNE method. 
+        self.data = eval(search_input(input_format, file_type[-1]))
         
         return self.data
     
