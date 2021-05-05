@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+0.1.9 (05/05/2021)
+------------------
+- Adding custom input percentage threshold for spectral entropy, power spectrum and shannon entropy.
+- Updating DTF to generate directed graphs. 
+
 0.1.8 (05/04/2021)
 ------------------
 - Updating Corrected cross-correlation default threshold.
