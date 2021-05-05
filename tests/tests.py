@@ -290,7 +290,7 @@ class TestTools(unittest.TestCase):
         for pair in edges_list:
             G1.add_edge(pair[0], pair[1], weight=1, thickness=1)
     
-        self.assertTrue(draw_graph(G1, False, False))
+        self.assertTrue(draw_graph(G1))
         
     def test_draw_graph_unkown_node(self):
         G1 = nx.Graph()
@@ -301,7 +301,7 @@ class TestTools(unittest.TestCase):
             G1.add_edge(pair[0], pair[1], weight=1, thickness=1)
     
         with self.assertWarns(Warning):
-            draw_graph(G1, True, True)
+            draw_graph(G1)
     
 
 class TestImportData(unittest.TestCase):
