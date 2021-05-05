@@ -20,7 +20,6 @@ class Graph:
         
 
     def modelate(self, window_size, connectivity, bands = [None], threshold = None):
-        
         print('\033[1m' + 'Model Data.' + '\033[0m')
         print(search(connectivity_measures, connectivity))
         
@@ -31,7 +30,6 @@ class Graph:
         
 
     def visualize(self, graph, name):
-        print(str(graph))
-        fig = draw_graph(graph, False, False)
+        fig = draw_graph(graph)
         fig.update_layout(title='', plot_bgcolor='white' ) 
         fig.write_html(str(name) + '_plot.html', auto_open=True, default_height='100%', default_width='100%')

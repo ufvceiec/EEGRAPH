@@ -426,7 +426,7 @@ def calculate_connectivity_single_channel_with_bands(data_intervals, sample_rate
     return values
 
 
-def make_graph(matrix, ch_names, threshold):
+def make_graph(matrix, ch_names, threshold, directed = False):
     """Process to create the networkX graphs.
     Parameters
     ----------
@@ -447,7 +447,11 @@ def make_graph(matrix, ch_names, threshold):
     #Loop over the number of graphs, creating the nx Graph, adding the nodes (which will be the same in all graphs) and adding an edge if the connectivity measure is above the threshold.
     #Also we add a weight to the edge, to draw the edge´s size according to this value. It is the connectivity coefficient to a power, to really difference big from smaller coefficients. 
     for k in range(num_graphs):
-        G[k] = nx.Graph()
+        if(directed):
+            G[k] = nx.DiGraph()
+        else:
+            G[k] = nx.Graph()
+            
         G[k].add_nodes_from(nodes)
         for i in range(num_nodes):
             for j in range(num_nodes):
@@ -484,12 +488,13 @@ def single_channel_graph(data, ch_names, channels, percentage_threshold, bands=N
     return G
         
         
-def draw_graph(G, directed, hover_nodes):
+def draw_graph(G):
     """Process to create the networkX graphs.
     Parameters
     ----------
     G : NetworkX graph
     """
+    directed = nx.is_directed(G)
     
     #Dictionary with all the possible electrode positions. 
     
