@@ -79,14 +79,14 @@ Example usage of the library with Pearson Correlation.
 ```python
 import eegraph
 G = eegraph.Graph()
-G.load_data(path = "espasmo1.edf", exclude = ['EEG TAntI1-TAntI', 'EEG TAntD1-TAntD', 'EEG EKG1-EKG2'])
+G.load_data(path = 'espasmo1.edf', exclude = ['EEG TAntI1-TAntI', 'EEG TAntD1-TAntD', 'EEG EKG1-EKG2'])
 ```
 #### Electrode Montage
 An electrode montage file can be specified for channels names while loading EEG data. Visit [documentation](https://github.com/ufvceiec/EEGRAPH/wiki/Load-data-from-EEG) for more info.
 ```python
 import eegraph
 G = eegraph.Graph()
-G.load_data(path = "espasmo1.edf", electrode_montage_path = 'electrodemontage.set.ced')
+G.load_data(path = 'espasmo1.edf', electrode_montage_path = 'electrodemontage.set.ced')
 ```
 ***
 ### Modelate data
