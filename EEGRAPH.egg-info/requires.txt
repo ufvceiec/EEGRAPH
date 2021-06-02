@@ -1,0 +1,9 @@
+numpy>=1.19.0
+pandas>=1.1.5
+mne==0.22.0
+networkx>=2.5
+plotly>=4.14.3
+scipy>=1.1.0
+scot==0.2.1
+matplotlib>=3.4.0
+antropy>=0.1.4
