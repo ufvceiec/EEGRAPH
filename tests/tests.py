@@ -132,7 +132,7 @@ class TestTools(unittest.TestCase):
     
     def test_calculate_bands_fft(self):
         values = np.random.uniform(0, 100, 2048)
-        sample_rate = 256 
+        sample_rate = 512 
         bands= [True, False, True, False, True]
         result = calculate_bands_fft(values, sample_rate, bands)
         
