@@ -217,10 +217,11 @@ def calculate_bands_fft(values, sample_rate, bands):
     """
     bands_dict = {0: 'Delta', 1:'Theta', 2:'Alpha', 3:'Beta', 4:'Gamma'}
     
-    fft_vals = np.absolute(np.fft.fft(values))
+    fft_vals = np.fft.fft(values)
     fft_freq = np.fft.fftfreq(len(values), 1/sample_rate)
+
     
-    bands_list = frequency_bands(fft_freq, fft_vals)
+    bands_list = obtain_frequency_bands(fft_freq, fft_vals)
     output_bands = [None] * 5
     
     for x,band in enumerate(bands_list):
@@ -228,14 +229,78 @@ def calculate_bands_fft(values, sample_rate, bands):
             if(bands[x]):
                 logging.warn(' Frequency band ' + bands_dict[x] + ' has no values. Either dont use this frequency band or use a bigger window size.')
                 print('\n')
-                output_bands[x] = np.absolute(np.fft.ifft(bands_list[x]))
+                output_bands[x] = np.real(np.fft.ifft(bands_list[x]))
             else:
                 output_bands[x] = [0,0]
         else:
-            output_bands[x] = np.absolute(np.fft.ifft(bands_list[x]))
+            output_bands[x] = np.real(np.fft.ifft(bands_list[x]))
             
     
     return output_bands[0], output_bands[1], output_bands[2], output_bands[3], output_bands[4]
+
+
+def obtain_frequency_bands(f,Y):
+    """Process to obtain the values for each frequency band.
+    Parameters
+    ----------
+    f : list
+        Frequency bins for given FFT parameters.
+    Y : ndarray
+        Array of values from which we divide into frequency bands. 
+    
+    Returns
+    -------
+    delta : array
+        Array with values within the ranges of delta band.
+    theta : array
+        Array with values within the ranges of theta band.
+    alpha : array
+        Array with values within the ranges of alpha band.
+    beta : array
+        Array with values within the ranges of beta band.
+    gamma : array
+        Array with values within the ranges of gamma band.
+    """
+    
+    delta_range = (1,4)
+    theta_range = (4,8)
+    alpha_range = (8,13)
+    beta_range = (13,30)
+    gamma_range = (30,45)
+    
+    delta = np.zeros(91, dtype='complex')
+    theta = np.zeros(91, dtype='complex')
+    alpha = np.zeros(91, dtype='complex')
+    beta = np.zeros(91, dtype='complex')
+    gamma = np.zeros(91, dtype='complex')
+    
+    delta[0] = Y[f==0]
+    d_vals = Y[(f>=delta_range[0]) & (f<=delta_range[1])]
+    delta[delta_range[0]:delta_range[0]+len(d_vals)] =  d_vals
+    delta[91-len(d_vals):91] = Y[(f>=-delta_range[1]) & (f<=-delta_range[0])]
+    
+    theta[0] = Y[f==0]
+    t_vals = Y[(f>=theta_range[0]) & (f<=theta_range[1])]
+    theta[theta_range[0]:theta_range[0]+len(t_vals)] = t_vals
+    theta[88-len(t_vals):88] = Y[(f>=-theta_range[1]) & (f<=-theta_range[0])]
+    
+    alpha[0] = Y[f==0]
+    a_vals = Y[(f>=alpha_range[0]) & (f<=alpha_range[1])]
+    alpha[alpha_range[0]:alpha_range[0]+len(a_vals)] = a_vals
+    alpha[84-len(a_vals):84] = Y[(f>=-alpha_range[1]) & (f<=-alpha_range[0])]
+    
+    beta[0] = Y[f==0]
+    b_vals = Y[(f>=beta_range[0]) & (f<=beta_range[1])]
+    beta[beta_range[0]:beta_range[0]+len(b_vals)] = b_vals
+    beta[79-len(b_vals):79] = Y[(f>=-beta_range[1]) & (f<=-beta_range[0])]
+    
+    gamma[0] = Y[f==0]
+    g_val = Y[(f>=gamma_range[0]) & (f<=gamma_range[1])]
+    gamma[gamma_range[0]:gamma_range[0]+len(g_val)] = g_val
+    gamma[62-len(g_val):62] = Y[(f>=-gamma_range[1]) & (f<=-gamma_range[0])]
+    
+    
+    return delta, theta, alpha, beta, gamma
 
 
 def frequency_bands(f,Y):
@@ -267,7 +332,6 @@ def frequency_bands(f,Y):
     beta_range = (13,30)
     gamma_range = (30,45)
     
-    #delta = ( Y[(f>delta_range[0]) & (f<=delta_range[1])].mean())
     delta = Y[(f>delta_range[0]) & (f<=delta_range[1])]
     theta = Y[(f>theta_range[0]) & (f<=theta_range[1])]
     alpha = Y[(f>alpha_range[0]) & (f<=alpha_range[1])]
