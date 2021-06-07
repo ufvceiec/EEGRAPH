@@ -384,7 +384,7 @@ class TestVisualizeData(unittest.TestCase):
     def test_visualize_channel_warning(self):
         G = eegraph.Graph()
         G.load_data('.test_eeg.gdf')
-        graphs, _ = G.modelate(window_size = 10, connectivity = 'plv', bands = ['theta'])
+        graphs, _ = G.modelate(window_size = 10, connectivity = 'cross_correlation')
         
         with self.assertWarns(Warning):
             G.visualize(graphs[0], 'test_2')
