@@ -537,7 +537,7 @@ def single_channel_graph(data, ch_names, channels, percentage_threshold, bands=N
     G = {}
     for i in range(num_graphs):
         G[i] = nx.Graph()
-        G[i].add_nodes_from(nodes, values=5)
+        G[i].add_nodes_from(nodes)
         elegible_nodes = []
         
         #Calculate the percentile of top channels channels for given percentage

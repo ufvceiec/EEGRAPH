@@ -275,7 +275,7 @@ class TestTools(unittest.TestCase):
         data = [0.81564148562685876, 0.30660675598762527, 0.71377519539990526, 0.3190937053018591, 0.38838726704914084, 0.7493007647717073, 0.35925485161888404, 0.9736121835275438, 0.84431093836793725, 0.3802669640607751, 0.3813287481487231, 0.4254342766449424, 0.72896987340610406, 0.3902971874488028, 0.35633248790669203, 0.34861031389046215]
         
         ch_names = ['Fp1', 'Fp2', 'AF7', 'AF3', 'AF4', 'AF8', 'F7', 'F5', 'F3', 'F1', 'Fz', 'F2', 'F4', 'F6', 'F8', 'FT9']
-        expected_edges = 6 #All edges between top 25% nodes. 16 channels -> 4 nodes with connections. All 4 nodes interconnected -> 6 edges in total. 
+        expected_edges = 22 #All edges between top 25% nodes. 16 channels -> 4 nodes with connections. All 4 nodes interconnected -> 6 edges in total + 16 self loops = 22
         
         result, _ = single_channel_graph(data, ch_names, channels, 0.25)
         self.assertEqual(len(result[0].nodes()), channels)
