@@ -272,13 +272,12 @@ class TestTools(unittest.TestCase):
         
     def test_make_single_channel_graph(self):
         channels = 16
-        data = [([0.54337644]), ([-0.85042714]), ([-0.63641063]), ([0.02879978]), ([0.97642451]), ([0.47373244]), ([-0.13785667]), ([-0.19336038]), ([0.55023686]), ([-0.05053916]), ([0.34913885]), 
-                ([-0.10666878]), ([0.94642219]), ([0.20702023]), ([-0.16919901]), ([-0.17072353])]
+        data = [0.41564148562685876, 0.30660675598762527, 0.41377519539990526, 0.3190937053018591, 0.38838726704914084, 0.3493007647717073, 0.35925485161888404, 0.3736121835275438, 0.34431093836793725, 0.3802669640607751, 0.3813287481487231, 0.4254342766449424, 0.32896987340610406, 0.3902971874488028, 0.35633248790669203, 0.34861031389046215]
         
         ch_names = ['Fp1', 'Fp2', 'AF7', 'AF3', 'AF4', 'AF8', 'F7', 'F5', 'F3', 'F1', 'Fz', 'F2', 'F4', 'F6', 'F8', 'FT9']
         expected_edges = 6 #All edges between top 25% nodes. 16 channels -> 4 nodes with connections. All 4 nodes interconnected -> 6 edges in total. 
         
-        result = single_channel_graph(data, ch_names, channels, 0.25)
+        result, _ = single_channel_graph(data, ch_names, channels, 0.25)
         self.assertEqual(len(result[0].nodes()), channels)
         self.assertEqual(len(result[0].edges()), expected_edges)
     
