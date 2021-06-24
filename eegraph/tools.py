@@ -464,6 +464,7 @@ def calculate_dtf(data_intervals, steps, channels, sample_rate, bands, flag):
 def calculate_connectivity_single_channel(data_intervals, sample_rate, connectivity):
     values = []
     intervals = len(data_intervals)
+    
     if(connectivity.flag):
         intervals = int(len(data_intervals)/2)
     
@@ -526,7 +527,8 @@ def make_graph(matrix, ch_names, threshold, directed = False):
     
     return G        
 
-def single_channel_graph(data, ch_names, channels, percentage_threshold, bands=None):     
+def single_channel_graph(data, ch_names, channels, percentage_threshold, bands=None):   
+    matrix = []
     num_graphs = int(len(data)/channels)
     print("Number of graphs created:", num_graphs)
     nodes = process_channel_names(ch_names)
@@ -543,13 +545,15 @@ def single_channel_graph(data, ch_names, channels, percentage_threshold, bands=N
 
 
         for j in range(channels):
+            G[i].add_edge(nodes[j], nodes[j], weight = data[(channels * i) + j], thickness=1)
             if(data[(channels * i) + j]) >= threshold:
                 elegible_nodes.append(nodes[j])
+                
         edges = combinations(elegible_nodes,2)        
         G[i].add_edges_from(edges, weight = 1, thickness=1)
+        matrix.append(nx.adjacency_matrix(G[i]).todense())
         
-        
-    return G
+    return G, np.array(matrix)
         
         
 def draw_graph(G):

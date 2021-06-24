@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+0.1.11 (06/09/2021)
+------------------
+- Fixing returned connectivity matrix for single channel connectivity measures (Power Spectrum, Spectral Entropy, Shannon Entropy). 
+- Graph visualization with single channel connectivity measures now include the value for each node. 
+
+
 0.1.10 (06/09/2021)
 ------------------
 - Fixing issue involving frequency bands. 

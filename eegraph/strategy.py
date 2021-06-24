@@ -54,9 +54,9 @@ class Connectivity_single_channel_With_Bands(Strategy):
         return self.connectivity_matrix
 
     def make_graph_workflow(self, data):
-        G = single_channel_graph(self.connectivity_matrix, data.ch_names, data.num_channels, data.threshold, self.bands)
+        G, c_m = single_channel_graph(self.connectivity_matrix, data.ch_names, data.num_channels, data.threshold, self.bands)
     
-        return G
+        return (G, c_m)
     
 class Connectivity_single_channel_No_Bands(Strategy):
     def calculate_connectivity_workflow(self, data, bands, window_size):
@@ -67,9 +67,9 @@ class Connectivity_single_channel_No_Bands(Strategy):
         return self.connectivity_matrix
 
     def make_graph_workflow(self, data):
-        G = single_channel_graph(self.connectivity_matrix, data.ch_names, data.num_channels, data.threshold)
+        G, c_m = single_channel_graph(self.connectivity_matrix, data.ch_names, data.num_channels, data.threshold)
     
-        return G
+        return (G, c_m)
     
 class Cross_correlation_rescaled(Strategy):
     def calculate_connectivity_workflow(self, data, bands, window_size):
@@ -96,7 +96,7 @@ class Dtf_With_Bands(Strategy):
     def make_graph_workflow(self, data):
         G = make_graph(self.connectivity_matrix, data.ch_names, data.threshold, True)
     
-        return G    
+        return G
         
         
 #Connectivity measures            

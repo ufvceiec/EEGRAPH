@@ -19,7 +19,13 @@ class ModelData:
             
         self.connectivity_matrix = self._strategy.calculate_connectivity_workflow(self, bands, window_size)
         print('\nThreshold:', self.threshold)
-        self.connectivity_graphs = self._strategy.make_graph_workflow(self)
+        
+        out = self._strategy.make_graph_workflow(self)
+        if(type(out) is tuple):
+            self.connectivity_graphs = out[0]
+            self.connectivity_matrix = out[1]
+        else:
+            self.connectivity_graphs = out
 
         return self.connectivity_graphs, self.connectivity_matrix
         
