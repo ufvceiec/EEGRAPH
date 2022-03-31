@@ -136,9 +136,9 @@ See [CHANGELOG.txt](CHANGELOG.txt) for major/breaking updates and version histor
 
 ## Contact
 Centro de Estudios e Innovación en Gestión del Conocimiento (CEIEC), Universidad Francisco de Vitoria.
-* Responsible: Alberto Nogales (alberto.nogales@ceiec.es)
-* Supervisor: Ana María Maitín
+* Responsible: Ana María Maitín, Alberto Nogales (alberto.nogales@ceiec.es)
 * Main developer: Pedro Chazarra
+* Contributor: Fernando Pérez ([@FernandoPerezLara](https://github.com/FernandoPerezLara))
 
 ## Disclaimer
 * There is a known issue with DTF connectivity, sometimes the error 'math domain error' is shown, it is part of an external library.
