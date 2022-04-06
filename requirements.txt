@@ -3,9 +3,6 @@ pandas>=1.1.5
 mne==0.22.0
 networkx>=2.5
 plotly>=4.14.3
-numba>=0.55.1
-stochastic>=0.6.0
-scikit-learn>=1.0.2
 scipy>=1.1.0
 scot==0.2.1
 matplotlib>=3.4.0
