@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+0.1.12 (31/03/2021)
+------------------
+- Removed exclude option for VHDR files
+
 0.1.11 (06/09/2021)
 ------------------
 - Fixing returned connectivity matrix for single channel connectivity measures (Power Spectrum, Spectral Entropy, Shannon Entropy). 
