@@ -27,7 +27,7 @@ class InputData:
             counter = 0
             for item in list(df[column]):
                 if(str(item) in nodes):
-                    counter+=1;
+                    counter+=1
                     if(counter > 4):
                         positions_number = list(df[column])
         

@@ -8,9 +8,9 @@ import plotly.graph_objects as go
 import logging
 import warnings
 
-input_format = {'edf': 'mne.io.read_raw_edf(self.path, exclude= self.exclude)', 'gdf': 'mne.io.read_raw_gdf(self.path, exclude= self.exclude)', 'vhdr': 'mne.io.read_raw_brainvision(self.path)',
-               'cnt': 'mne.io.read_raw_cnt(self.path, exclude= self.exclude)', 'bdf': 'mne.io.read_raw_edf(self.path, exclude= self.exclude)', 'egi': 'mne.io.read_raw_egi(self.path, exclude= self.exclude)', 
-                'mff': 'mne.io.read_raw_egi(self.path, exclude= self.exclude)', 'nxe': 'mne.io.read_raw_eximia(self.path, exclude= self.exclude)'}
+input_format = {'edf': 'mne.io.read_raw_edf(self.path, exclude= self.exclude)', 'gdf': 'mne.io.read_raw_gdf(self.path, exclude= self.exclude)', 'vhdr': 'mne.io.read_raw_egi(self.path)',
+               'cnt': 'mne.io.read_raw_cnt(self.path)', 'bdf': 'mne.io.read_raw_edf(self.path, exclude= self.exclude)', 'egi': 'mne.io.read_raw_egi(self.path, exclude= self.exclude)', 
+                'mff': 'mne.io.read_raw_egi(self.path, exclude= self.exclude)', 'nxe': 'mne.io.read_raw_eximia(self.path)', 'eeg': 'mne.io.read_raw_nihon(self.path)'}
 
 connectivity_measures = {'cross_correlation': 'Cross_correlation_Estimator', 'pearson_correlation': 'Pearson_correlation_Estimator', 'squared_coherence': 'Squared_coherence_Estimator',
                          'imag_coherence': 'Imag_coherence_Estimator', 'corr_cross_correlation': 'Corr_cross_correlation_Estimator', 'wpli': 'Wpli_Estimator', 
