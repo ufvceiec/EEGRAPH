@@ -1,4 +1,3 @@
-import mne
 import pandas as pd
 from .tools import process_channel_names, search_input, input_format
     
