@@ -9,7 +9,7 @@ import logging
 import warnings
 
 input_format = {'edf': 'mne.io.read_raw_edf(self.path, exclude= self.exclude)', 'gdf': 'mne.io.read_raw_gdf(self.path, exclude= self.exclude)', 'vhdr': 'mne.io.read_raw_egi(self.path)',
-               'cnt': 'mne.io.read_raw_cnt(self.path)', 'bdf': 'mne.io.read_raw_edf(self.path, exclude= self.exclude)', 'egi': 'mne.io.read_raw_egi(self.path, exclude= self.exclude)', 
+               'cnt': 'mne.io.read_raw_cnt(self.path)', 'bdf': 'mne.io.read_raw_bdf(self.path, exclude= self.exclude)', 'egi': 'mne.io.read_raw_egi(self.path, exclude= self.exclude)', 
                 'mff': 'mne.io.read_raw_egi(self.path, exclude= self.exclude)', 'nxe': 'mne.io.read_raw_eximia(self.path)',
                 # 'eeg': 'mne.io.read_raw_nihon(self.path)' # FIXME: 'ascii' codec can't decode byte 0xc5 in position 3: ordinal not in range(128)
                 }
