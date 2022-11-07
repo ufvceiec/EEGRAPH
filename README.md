@@ -136,7 +136,7 @@ See [CHANGELOG.txt](CHANGELOG.txt) for major/breaking updates and version histor
 
 ## Contact
 Centro de Estudios e Innovación en Gestión del Conocimiento (CEIEC), Universidad Francisco de Vitoria.
-* Responsible: Ana María Maitín, Alberto Nogales (alberto.nogales@ceiec.es)
+* Responsible: Ana María Maitín (a.maitin@ceiec.es), Alberto Nogales (alberto.nogales@ceiec.es)
 * Main developer: Pedro Chazarra
 * Contributor: Fernando Pérez ([@FernandoPerezLara](https://github.com/FernandoPerezLara))
 
