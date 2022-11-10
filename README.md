@@ -125,6 +125,9 @@ G.visualize(graphs[0], 'graph_1')
 ```
 ![Connectivity Graph Output Example](https://github.com/ufvceiec/EEGRAPH/blob/develop/demo/eegraph_output.gif)
 
+### Execution example video
+![Execution example video](https://github.com/ufvceiec/EEGRAPH/blob/develop/demo/Video_EEGraph.mp4)
+
 ## EEGraph Workflow
 ![EEGraph Workflow Example](https://github.com/ufvceiec/EEGRAPH/blob/develop-refactor/demo/eegraph_workflow.png)
  
