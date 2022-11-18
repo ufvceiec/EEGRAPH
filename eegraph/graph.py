@@ -28,7 +28,13 @@ class Graph:
         return connectivity_matrix, G
         
 
-    def visualize(self, graph, name):
+    def visualize_html(self, graph, name):
         fig = draw_graph(graph)
         fig.update_layout(title='', plot_bgcolor='white' ) 
         fig.write_html(str(name) + '_plot.html', auto_open=True, default_height='100%', default_width='100%')
+        
+        
+    def visualize_png(self, graph, name):
+        fig = draw_graph(graph)
+        fig.update_layout(title='', plot_bgcolor='white' ) 
+        fig.write_image(str(name) + '_plot.png', auto_open=True, default_height='100%', default_width='100%')
