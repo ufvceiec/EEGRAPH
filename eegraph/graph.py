@@ -37,4 +37,4 @@ class Graph:
     def visualize_png(self, graph, name):
         fig = draw_graph(graph)
         fig.update_layout(title='', plot_bgcolor='white' ) 
-        fig.write_image(str(name) + '_plot.png', auto_open=True, default_height='100%', default_width='100%')
+        fig.write_image(str(name) + '_plot.png', format='png')
