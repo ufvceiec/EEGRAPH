@@ -28,6 +28,8 @@ What libraries does EEGraph use.
 * Scipy
 * Scot
 * Antropy
+* Kaleido
+
 
 ### Installing EEGraph
 
