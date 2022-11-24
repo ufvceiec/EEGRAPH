@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
 setup(
     name='EEGRAPH',
-    version='0.1.14',
+    version='0.1.16',
     description='',
     url='https://github.com/ufvceiec/EEGRAPH',
     author='CEIEC',
