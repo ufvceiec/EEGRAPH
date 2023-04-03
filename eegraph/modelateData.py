@@ -14,7 +14,7 @@ class ModelData:
         
     def connectivity_workflow(self, bands, window_size, threshold):
         #If the user assigns a new threshold
-        if(threshold):
+        if(threshold) is not None:
             self.threshold = threshold
             
         self.connectivity_matrix = self._strategy.calculate_connectivity_workflow(self, bands, window_size)
