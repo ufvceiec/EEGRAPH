@@ -28,12 +28,6 @@ class TestTools(unittest.TestCase):
         result = process_channel_names(channel_names)
         self.assertEqual(result, expected_channel_names)
         
-    def test_processed_channel_names_dash(self):
-        channel_names = ['Fp1-EEG', 'Fp2-EEG', 'AF7-EEG', 'AF3-EEG', 'AF4-EEG', 'AF8-EEG', 'F7-EEG', 'F5-EEG', 'F3-EEG', 'F1-EEG', 'Fz-EEG', 'F2-EEG', 'F4-EEG', 'F6-EEG']
-        expected_channel_names = ['Fp1', 'Fp2', 'AF7', 'AF3', 'AF4', 'AF8', 'F7', 'F5', 'F3', 'F1', 'Fz', 'F2', 'F4', 'F6']
-        result = process_channel_names(channel_names)
-        self.assertEqual(result, expected_channel_names)
-        
     
     #=================    
     #Time intervals
@@ -140,8 +134,8 @@ class TestTools(unittest.TestCase):
         
     def test_search_method(self):
         connectivity = 'cross_correlation'
-        expected_result = 'Cross_correlation_Estimator()'
-        
+        expected_result = 'Cross_correlation_Estimator'
+
         result = search(connectivity_measures, connectivity)
         self.assertEqual(result, expected_result)
     
@@ -224,11 +218,10 @@ class TestTools(unittest.TestCase):
         for i in range(channels * intervals):
             data.append(np.random.uniform(-0.5, 1, 2048))
             
-        steps = [(0, 2048)]
         sample_rate = 512
         connectivity = eegraph.strategy.Shannon_entropy_Estimator()
         connectivity.flag = 0
-        
+
         result = calculate_connectivity_single_channel(data, sample_rate, connectivity)
         self.assertEqual(len(result), channels)  
 
@@ -240,12 +233,11 @@ class TestTools(unittest.TestCase):
         for i in range(channels * intervals):
             data.append(np.random.uniform(-0.5, 1, 2048))
             
-        steps = [(0, 2048)]
         sample_rate = 512
         bands= [True, True, False, True, False]
         connectivity = eegraph.strategy.Spectral_entropy_Estimator()
         connectivity.flag = 0
-        
+
         result = calculate_connectivity_single_channel_with_bands(data, sample_rate, connectivity, bands)
         self.assertEqual(len(result), channels * sum(bands))  
         

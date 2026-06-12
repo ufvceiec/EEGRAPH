@@ -8,11 +8,7 @@ import plotly.graph_objects as go
 import logging
 import warnings
 
-input_format = {'edf': 'mne.io.read_raw_edf(self.path, exclude= self.exclude)', 'gdf': 'mne.io.read_raw_gdf(self.path, exclude= self.exclude)', 'vhdr': 'mne.io.read_raw_egi(self.path)',
-               'cnt': 'mne.io.read_raw_cnt(self.path)', 'bdf': 'mne.io.read_raw_bdf(self.path, exclude= self.exclude)', 'egi': 'mne.io.read_raw_egi(self.path, exclude= self.exclude)', 
-                'mff': 'mne.io.read_raw_egi(self.path, exclude= self.exclude)', 'nxe': 'mne.io.read_raw_eximia(self.path)',
-                # 'eeg': 'mne.io.read_raw_nihon(self.path)' # FIXME: 'ascii' codec can't decode byte 0xc5 in position 3: ordinal not in range(128)
-                }
+input_format = {'edf', 'gdf', 'vhdr', 'cnt', 'bdf', 'egi', 'mff', 'nxe'}
 
 connectivity_measures = {'cross_correlation': 'Cross_correlation_Estimator', 'pearson_correlation': 'Pearson_correlation_Estimator', 'squared_coherence': 'Squared_coherence_Estimator',
                          'imag_coherence': 'Imag_coherence_Estimator', 'corr_cross_correlation': 'Corr_cross_correlation_Estimator', 'wpli': 'Wpli_Estimator', 
@@ -20,15 +16,14 @@ connectivity_measures = {'cross_correlation': 'Cross_correlation_Estimator', 'pe
                          'spectral_entropy': 'Spectral_entropy_Estimator', 'shannon_entropy': 'Shannon_entropy_Estimator'}
 
 def search_input(values, searchFor):
-    for k in values:
-        if (searchFor == k):
-            return values[k]
+    if searchFor in values:
+        return searchFor
     raise NameError('File extension ' + "'" + searchFor + "'" + ' is not supported.')
     
 def search(values, searchFor):
     for k in values:
         if (searchFor == k):
-            return (values[k] + '()')
+            return values[k]
     raise NameError('Connectivity Measure ' + "'" + searchFor + "'" + ' does not exist.')
 
 def need_bands(bands):
@@ -42,7 +37,7 @@ def dont_need_bands(bands):
         
 def re_scaling(raw_data):
     df = pd.DataFrame(raw_data)
-    df.sub(df.mean(axis=1), axis=0)
+    df = df.sub(df.mean(axis=1), axis=0)
     scaled_data = df.to_numpy()
 
     return scaled_data
@@ -123,7 +118,7 @@ def time_stamps(seconds, sample_rate, sample_length, sample_duration):
     intervals, i, flag = [] , 0, 0
     
     #If the input is a list, but only contains one value it is a window size. 
-    if type(seconds) == list:
+    if isinstance(seconds, list):
         if len(seconds) == 1:
             seconds = seconds[0]
         #If it is a list, and contains more than one value is a set of intervals. 
@@ -147,7 +142,7 @@ def time_stamps(seconds, sample_rate, sample_length, sample_duration):
                     i += samples_per_frame
     
     #If the input is int or float. 
-    if type(seconds) == int or type(seconds) == float:
+    if isinstance(seconds, (int, float)):
         #Samples in the frame will be the result of the window size x sample frequency.
         samples_per_frame = (seconds * sample_rate)
         
@@ -158,10 +153,10 @@ def time_stamps(seconds, sample_rate, sample_length, sample_duration):
             #The End will be the Start for the next step. 
             i = i + samples_per_frame
         
-        #If the next time we add the samples per frame it is bigger than the sample length, append the remaining data points in a new interval. 
-        #This new interval will not be the same size as the others. 
-        if(i+samples_per_frame >= sample_length):
-            intervals.append((i,sample_length))
+        #If the next time we add the samples per frame it is bigger than the sample length, append the remaining data points in a new interval.
+        #This new interval will not be the same size as the others.
+        if i + samples_per_frame >= sample_length and i < sample_length:
+            intervals.append((i, sample_length))
     
     #Round the intervals for the printed output
     intervals_rounded = [(round(steps[0],2), round(steps[1],2)) for steps in intervals]
@@ -229,7 +224,7 @@ def calculate_bands_fft(values, sample_rate, bands):
     for x,band in enumerate(bands_list):
         if(len(band)<1):
             if(bands[x]):
-                logging.warn(' Frequency band ' + bands_dict[x] + ' has no values. Either dont use this frequency band or use a bigger window size.')
+                logging.warning(' Frequency band ' + bands_dict[x] + ' has no values. Either dont use this frequency band or use a bigger window size.')
                 print('\n')
                 output_bands[x] = np.real(np.fft.ifft(bands_list[x]))
             else:
@@ -276,27 +271,27 @@ def obtain_frequency_bands(f,Y):
     beta = np.zeros(91, dtype='complex')
     gamma = np.zeros(91, dtype='complex')
     
-    delta[0] = Y[f==0]
+    delta[0] = Y[f==0][0]
     d_vals = Y[(f>=delta_range[0]) & (f<=delta_range[1])]
     delta[delta_range[0]:delta_range[0]+len(d_vals)] =  d_vals
     delta[91-len(d_vals):91] = Y[(f>=-delta_range[1]) & (f<=-delta_range[0])]
     
-    theta[0] = Y[f==0]
+    theta[0] = Y[f==0][0]
     t_vals = Y[(f>=theta_range[0]) & (f<=theta_range[1])]
     theta[theta_range[0]:theta_range[0]+len(t_vals)] = t_vals
     theta[88-len(t_vals):88] = Y[(f>=-theta_range[1]) & (f<=-theta_range[0])]
     
-    alpha[0] = Y[f==0]
+    alpha[0] = Y[f==0][0]
     a_vals = Y[(f>=alpha_range[0]) & (f<=alpha_range[1])]
     alpha[alpha_range[0]:alpha_range[0]+len(a_vals)] = a_vals
     alpha[84-len(a_vals):84] = Y[(f>=-alpha_range[1]) & (f<=-alpha_range[0])]
     
-    beta[0] = Y[f==0]
+    beta[0] = Y[f==0][0]
     b_vals = Y[(f>=beta_range[0]) & (f<=beta_range[1])]
     beta[beta_range[0]:beta_range[0]+len(b_vals)] = b_vals
     beta[79-len(b_vals):79] = Y[(f>=-beta_range[1]) & (f<=-beta_range[0])]
     
-    gamma[0] = Y[f==0]
+    gamma[0] = Y[f==0][0]
     g_val = Y[(f>=gamma_range[0]) & (f<=gamma_range[1])]
     gamma[gamma_range[0]:gamma_range[0]+len(g_val)] = g_val
     gamma[62-len(g_val):62] = Y[(f>=-gamma_range[1]) & (f<=-gamma_range[0])]
@@ -334,7 +329,7 @@ def frequency_bands(f,Y):
     beta_range = (13,30)
     gamma_range = (30,45)
     
-    delta = Y[(f>delta_range[0]) & (f<=delta_range[1])]
+    delta = Y[(f>=delta_range[0]) & (f<=delta_range[1])]
     theta = Y[(f>theta_range[0]) & (f<=theta_range[1])]
     alpha = Y[(f>alpha_range[0]) & (f<=alpha_range[1])]
     beta = Y[(f>beta_range[0]) & (f<=beta_range[1])]
@@ -543,7 +538,7 @@ def single_channel_graph(data, ch_names, channels, percentage_threshold, bands=N
         elegible_nodes = []
         
         #Calculate the percentile of top channels channels for given percentage
-        threshold = np.percentile(data[(i*channels):(((i+1)*channels)-1)], percentile)
+        threshold = np.percentile(data[(i*channels):((i+1)*channels)], percentile)
 
 
         for j in range(channels):
