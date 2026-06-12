@@ -29,6 +29,32 @@ class Graph:
         return connectivity_matrix, G
         
 
+    def compute_metrics(self, graphs):
+        """Compute graph-theoretic metrics for one or all graphs.
+
+        Parameters
+        ----------
+        graphs : dict or NetworkX Graph/DiGraph
+            Either the full dictionary returned by ``modelate()`` or a single
+            NetworkX graph (e.g. ``graphs[0]``).
+
+        Returns
+        -------
+        metrics : dict
+            If a dict of graphs is passed, returns ``{graph_index: metrics_dict}``.
+            If a single graph is passed, returns its ``metrics_dict`` directly.
+
+        Examples
+        --------
+        >>> graphs, matrix = G.modelate(window_size=5, connectivity='pearson_correlation')
+        >>> metrics = G.compute_metrics(graphs)          # all windows
+        >>> metrics = G.compute_metrics(graphs[0])       # single window
+        """
+        if isinstance(graphs, dict):
+            return compute_metrics_all(graphs)
+        else:
+            return compute_graph_metrics(graphs)
+
     def visualize_html(self, graph, name, auto_open = True):
         fig = draw_graph(graph)
         fig.update_layout(title='', plot_bgcolor='white' ) 

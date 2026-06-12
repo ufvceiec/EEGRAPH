@@ -273,6 +273,76 @@ class TestTools(unittest.TestCase):
         self.assertEqual(len(result[0].nodes()), channels)
         self.assertEqual(len(result[0].edges()), expected_edges)
     
+    #=================
+    #Graph metrics
+
+    def _make_test_graph(self):
+        """Helper: small fully-connected weighted graph with known properties."""
+        G = nx.Graph()
+        nodes = ['Fp1', 'Fp2', 'AF7', 'AF3']
+        G.add_nodes_from(nodes)
+        for u, v in [('Fp1','Fp2'), ('Fp1','AF7'), ('Fp1','AF3'),
+                     ('Fp2','AF7'), ('Fp2','AF3'), ('AF7','AF3')]:
+            G.add_edge(u, v, weight=0.8, thickness=1)
+        return G
+
+    def test_compute_graph_metrics_keys(self):
+        G = self._make_test_graph()
+        metrics = compute_graph_metrics(G)
+        expected_keys = [
+            'density', 'transitivity', 'average_clustering',
+            'global_efficiency', 'local_efficiency', 'average_path_length',
+            'degree_assortativity', 'small_world_sigma',
+            'degree_centrality', 'betweenness_centrality', 'eigenvector_centrality'
+        ]
+        for key in expected_keys:
+            self.assertIn(key, metrics)
+
+    def test_compute_graph_metrics_density(self):
+        G = self._make_test_graph()
+        metrics = compute_graph_metrics(G)
+        # 4 nodes fully connected → density = 1.0
+        self.assertAlmostEqual(metrics['density'], 1.0)
+
+    def test_compute_graph_metrics_scalar_ranges(self):
+        G = self._make_test_graph()
+        metrics = compute_graph_metrics(G)
+        for key in ['density', 'transitivity', 'average_clustering',
+                    'global_efficiency', 'local_efficiency']:
+            self.assertGreaterEqual(metrics[key], 0.0)
+            self.assertLessEqual(metrics[key], 1.0)
+
+    def test_compute_graph_metrics_centrality_nodes(self):
+        G = self._make_test_graph()
+        metrics = compute_graph_metrics(G)
+        for key in ['degree_centrality', 'betweenness_centrality', 'eigenvector_centrality']:
+            self.assertEqual(set(metrics[key].keys()), set(G.nodes()))
+
+    def test_compute_graph_metrics_disconnected(self):
+        G = nx.Graph()
+        G.add_nodes_from(['Fp1', 'Fp2', 'AF7', 'AF3'])
+        G.add_edge('Fp1', 'Fp2', weight=0.9, thickness=1)
+        # Graph is disconnected — average_path_length should still return a value
+        metrics = compute_graph_metrics(G)
+        self.assertIn('average_path_length', metrics)
+
+    def test_compute_graph_metrics_directed(self):
+        G = nx.DiGraph()
+        G.add_nodes_from(['Fp1', 'Fp2', 'AF7'])
+        G.add_edge('Fp1', 'Fp2', weight=0.7, thickness=1)
+        G.add_edge('Fp2', 'AF7', weight=0.6, thickness=1)
+        # Should not raise; directed graph is converted internally
+        metrics = compute_graph_metrics(G)
+        self.assertIn('density', metrics)
+
+    def test_compute_metrics_all(self):
+        G = self._make_test_graph()
+        graphs = {0: G, 1: G}
+        all_metrics = compute_metrics_all(graphs)
+        self.assertEqual(set(all_metrics.keys()), {0, 1})
+        for m in all_metrics.values():
+            self.assertIn('density', m)
+
     def test_draw_graph(self):
         G1 = nx.Graph()
         nodes_list = ['Fp1', 'Fp2', 'AF7', 'AF3', 'AF4', 'AF8', 'F7', 'F5', 'F3', 'F1', 'Fz', 'F2', 'F4', 'F6', 'F8', 'FT9']
