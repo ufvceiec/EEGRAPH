@@ -145,6 +145,42 @@ kaleido==0.2.1
 
 ---
 
+## Graph metrics functions
+
+Two pure functions in `tools.py` compute NetworkX graph-theoretic metrics:
+
+### `compute_graph_metrics(G)`
+
+Accepts a single `networkx.Graph` (one entry from the `graphs` dict). Returns a `dict` with keys:
+
+| Key | Description |
+|-----|-------------|
+| `'nodes'` | `G.number_of_nodes()` |
+| `'edges'` | `G.number_of_edges()` |
+| `'density'` | `nx.density(G)` |
+| `'average_clustering'` | `nx.average_clustering(G)` |
+| `'average_shortest_path'` | `nx.average_shortest_path_length(G)` or `None` if disconnected |
+| `'betweenness_centrality'` | `dict` of node → betweenness |
+| `'closeness_centrality'` | `dict` of node → closeness |
+| `'degree_centrality'` | `dict` of node → degree |
+
+### `compute_metrics_all(graphs)`
+
+Iterates the full `graphs` dict (from `modelate()`) and applies `compute_graph_metrics` to each entry. Returns a `dict` with the same keys as `graphs`, each mapped to a metrics dict.
+
+`Graph.compute_metrics(graphs)` in `graph.py` is a thin wrapper around `compute_metrics_all`.
+
+**Usage:**
+
+```python
+graphs, matrix = G.modelate(window_size=2, connectivity='pearson_correlation')
+metrics = G.compute_metrics(graphs)
+for key, m in metrics.items():
+    print(key, m['density'])
+```
+
+---
+
 ## Frequency bands
 
 | Band | Range |

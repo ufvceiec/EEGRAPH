@@ -8,3 +8,9 @@ scot==0.2.1
 numba~=0.56.0
 antropy>=0.1.4
 kaleido==0.2.1
+
+# Documentation
+mkdocs>=1.5
+mkdocs-material>=9.0
+mkdocstrings
+pymdown-extensions>=10.0
