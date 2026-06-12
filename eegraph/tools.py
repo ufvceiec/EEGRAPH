@@ -488,6 +488,140 @@ def calculate_connectivity_single_channel_with_bands(data_intervals, sample_rate
     return values
 
 
+def compute_graph_metrics(G):
+    """Compute graph-theoretic metrics on a single NetworkX graph.
+
+    Parameters
+    ----------
+    G : NetworkX Graph or DiGraph
+        A brain connectivity graph produced by EEGraph.
+
+    Returns
+    -------
+    metrics : dict
+        Dictionary with the following keys:
+
+        Network-level scalars
+        ---------------------
+        density : float
+            Fraction of possible edges that are present. Range [0, 1].
+        transitivity : float
+            Global clustering coefficient (ratio of triangles to triplets). Range [0, 1].
+        average_clustering : float
+            Mean local clustering coefficient across nodes. Range [0, 1].
+        global_efficiency : float
+            Average inverse shortest path length; robust to disconnected graphs. Range [0, 1].
+        local_efficiency : float
+            Average efficiency of node neighbourhoods. Range [0, 1].
+        average_path_length : float
+            Mean shortest path length. Computed on the largest connected component
+            when the graph is disconnected. NaN if graph has fewer than 2 connected nodes.
+        degree_assortativity : float
+            Pearson correlation of degrees of connected node pairs. Range [-1, 1].
+            NaN if undefined (e.g. all nodes have the same degree).
+        small_world_sigma : float
+            Small-world coefficient σ = (C / C_rand) / (L / L_rand).
+            σ > 1 indicates small-world organisation. NaN if not computable.
+
+        Node-level dicts  {node_label: value}
+        --------------------------------------
+        degree_centrality : dict
+        betweenness_centrality : dict
+        eigenvector_centrality : dict
+            NaN per node if power iteration fails to converge.
+    """
+    # Work on an undirected, self-loop-free copy for all metrics
+    G_und = G.to_undirected() if nx.is_directed(G) else G
+    G_clean = nx.Graph(G_und)
+    G_clean.remove_edges_from(nx.selfloop_edges(G_clean))
+
+    metrics = {}
+
+    # ------------------------------------------------------------------ #
+    # Network-level scalars                                                #
+    # ------------------------------------------------------------------ #
+    metrics['density']             = nx.density(G_clean)
+    metrics['transitivity']        = nx.transitivity(G_clean)
+    metrics['average_clustering']  = nx.average_clustering(G_clean, weight='weight')
+    metrics['global_efficiency']   = nx.global_efficiency(G_clean)
+    metrics['local_efficiency']    = nx.local_efficiency(G_clean)
+
+    # Average path length — requires a connected graph; use largest CC otherwise
+    n = len(G_clean)
+    if n > 1 and G_clean.number_of_edges() > 0:
+        if nx.is_connected(G_clean):
+            metrics['average_path_length'] = nx.average_shortest_path_length(G_clean, weight=None)
+        else:
+            largest_cc = G_clean.subgraph(
+                max(nx.connected_components(G_clean), key=len)
+            ).copy()
+            if len(largest_cc) > 1:
+                metrics['average_path_length'] = nx.average_shortest_path_length(largest_cc, weight=None)
+                logging.warning(
+                    'Graph is disconnected. average_path_length computed on '
+                    'the largest connected component (%d / %d nodes).',
+                    len(largest_cc), n
+                )
+            else:
+                metrics['average_path_length'] = float('nan')
+    else:
+        metrics['average_path_length'] = float('nan')
+
+    # Degree assortativity
+    try:
+        metrics['degree_assortativity'] = nx.degree_assortativity_coefficient(G_clean)
+    except Exception:
+        metrics['degree_assortativity'] = float('nan')
+
+    # Small-world sigma: σ = (C / C_rand) / (L / L_rand)
+    # Analytical approximations: C_rand ≈ <k> / n,  L_rand ≈ ln(n) / ln(<k>)
+    if n > 1 and G_clean.number_of_edges() > 0:
+        k_mean = np.mean([d for _, d in G_clean.degree()])
+        C = metrics['average_clustering']
+        L = metrics['average_path_length']
+        if k_mean > 1 and not np.isnan(L) and L > 0:
+            C_rand = k_mean / n
+            L_rand = np.log(n) / np.log(k_mean)
+            metrics['small_world_sigma'] = (C / C_rand) / (L / L_rand) if C_rand > 0 else float('nan')
+        else:
+            metrics['small_world_sigma'] = float('nan')
+    else:
+        metrics['small_world_sigma'] = float('nan')
+
+    # ------------------------------------------------------------------ #
+    # Node-level centrality dicts                                          #
+    # ------------------------------------------------------------------ #
+    metrics['degree_centrality']       = nx.degree_centrality(G_clean)
+    metrics['betweenness_centrality']  = nx.betweenness_centrality(G_clean, weight='weight')
+
+    try:
+        metrics['eigenvector_centrality'] = nx.eigenvector_centrality(
+            G_clean, weight='weight', max_iter=1000
+        )
+    except nx.PowerIterationFailedConvergence:
+        logging.warning('Eigenvector centrality did not converge. Returning NaN for all nodes.')
+        metrics['eigenvector_centrality'] = {node: float('nan') for node in G_clean.nodes()}
+
+    return metrics
+
+
+def compute_metrics_all(graphs):
+    """Compute graph-theoretic metrics for every graph in the EEGraph output dict.
+
+    Parameters
+    ----------
+    graphs : dict
+        Dictionary of NetworkX graphs as returned by ``Graph.modelate()``.
+
+    Returns
+    -------
+    all_metrics : dict
+        Dictionary ``{graph_index: metrics_dict}`` where each value is the
+        output of :func:`compute_graph_metrics`.
+    """
+    return {k: compute_graph_metrics(G) for k, G in graphs.items()}
+
+
 def make_graph(matrix, ch_names, threshold, directed = False):
     """Process to create the networkX graphs.
     Parameters
