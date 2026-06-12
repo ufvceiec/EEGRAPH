@@ -20,9 +20,10 @@ class Graph:
 
     def modelate(self, window_size, connectivity, bands = [None], threshold = None):
         print('\033[1m' + 'Model Data.' + '\033[0m')
-        print(search(connectivity_measures, connectivity))
-        
-        model_data = ModelData(self.data, self.ch_names, eval(search(connectivity_measures, connectivity)))  
+        cls_name = search(connectivity_measures, connectivity)
+        print(cls_name)
+
+        model_data = ModelData(self.data, self.ch_names, globals()[cls_name]())  
         connectivity_matrix, G = model_data.connectivity_workflow(bands, window_size, threshold)
         
         return connectivity_matrix, G

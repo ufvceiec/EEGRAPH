@@ -27,7 +27,7 @@ setup(
     url='https://github.com/ufvceiec/EEGRAPH',
     author='CEIEC',
     license= 'GPL-3.0',
-    classifers=classifiers,
+    classifiers=classifiers,
     keywords='',
     packages=find_packages(),
     install_requires=install_requires,

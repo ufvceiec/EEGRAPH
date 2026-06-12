@@ -113,7 +113,7 @@ class Cross_correlation_Estimator(Cross_correlation_rescaled):
         Ryy = signal.correlate(y,y, 'full')
         
         lags = np.arange(-len(data_intervals[i]) + 1, len(data_intervals[i]))
-        lag_0 = int((np.where(lags==0))[0])
+        lag_0 = int(np.where(lags==0)[0][0])
 
         Rxx_0 = Rxx[lag_0]
         Ryy_0 = Ryy[lag_0]
@@ -175,7 +175,7 @@ class Corr_cross_correlation_Estimator(Cross_correlation_rescaled):
         Ryy = signal.correlate(y,y, 'full')
         
         lags = np.arange(-len(data_intervals[i]) + 1, len(data_intervals[i]))
-        lag_0 = int((np.where(lags==0))[0])
+        lag_0 = int(np.where(lags==0)[0][0])
 
         Rxx_0 = Rxx[lag_0]
         Ryy_0 = Ryy[lag_0]
@@ -183,8 +183,11 @@ class Corr_cross_correlation_Estimator(Cross_correlation_rescaled):
         Rxy_norm = (1/(np.sqrt(Rxx_0*Ryy_0)))* Rxy
         negative_lag = Rxy_norm[:lag_0]
         positive_lag = Rxy_norm[lag_0 + 1:]
-        
-        corCC = positive_lag - negative_lag
+
+        min_len = min(len(positive_lag), len(negative_lag))
+        if min_len == 0:
+            return 0.0
+        corCC = positive_lag[:min_len] - negative_lag[:min_len]
         
         #We use the mean from lag 0 to a 10% displacement. 
         disp = round((len(data_intervals[i])) * 0.10)

@@ -1,25 +1,35 @@
 import mne
 import pandas as pd
 from .tools import process_channel_names, search_input, input_format
-    
+
+_readers = {
+    'edf': lambda path, exclude: mne.io.read_raw_edf(path, exclude=exclude),
+    'gdf': lambda path, exclude: mne.io.read_raw_gdf(path, exclude=exclude),
+    'vhdr': lambda path, exclude: mne.io.read_raw_brainvision(path),
+    'cnt': lambda path, exclude: mne.io.read_raw_cnt(path),
+    'bdf': lambda path, exclude: mne.io.read_raw_bdf(path, exclude=exclude),
+    'egi': lambda path, exclude: mne.io.read_raw_egi(path, exclude=exclude),
+    'mff': lambda path, exclude: mne.io.read_raw_egi(path, exclude=exclude),
+    'nxe': lambda path, exclude: mne.io.read_raw_eximia(path),
+}
+
 class InputData:
     def __init__(self, path, exclude):
         self.path = path
         self.exclude = exclude
-        
-    def load(self):       
-        #Split the path in two parts, left and right of the dot. 
+
+    def load(self):
         file_type = self.path.split(".")
 
         #https://mne.tools/0.17/manual/io.html
-        #Check the extension of the file in the input format dictionary, and use the proper MNE method. 
-        self.data = eval(search_input(input_format, file_type[-1]))
+        ext = search_input(input_format, file_type[-1])
+        self.data = _readers[ext](self.path, self.exclude)
         
         return self.data
     
     def set_montage(self, electrode_montage_path):
         nodes = process_channel_names(self.data.ch_names)
-        df = pd.read_csv(electrode_montage_path, delimiter= "\s+|;|:", engine='python')
+        df = pd.read_csv(electrode_montage_path, delimiter= r"\s+|;|:", engine='python')
 
         
         positions_number = []

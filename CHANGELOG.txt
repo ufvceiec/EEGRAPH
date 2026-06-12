@@ -1,6 +1,26 @@
 Change Log
 ==========
 
+0.1.17 (2026-06-12)
+------------------
+- Fixed re_scaling(): result of df.sub() was discarded; now correctly assigned back.
+- Fixed off-by-one in single_channel_graph(): percentile slice excluded last channel.
+- Fixed delta band lower boundary in frequency_bands(): changed > to >= for consistency with obtain_frequency_bands().
+- Fixed isinstance() checks in time_stamps() replacing type() == comparisons (fixes numpy scalar types).
+- Fixed zero-length interval guard in time_stamps() when EEG length equals exact window multiple.
+- Fixed deprecated logging.warn() → logging.warning().
+- Fixed eval() in importData.load(): replaced with _readers dispatch dict of lambdas.
+- Fixed eval() in Graph.modelate(): replaced with globals() lookup; search() now returns class name without parentheses.
+- Fixed if(threshold) is not None: parenthesis error in ModelData.connectivity_workflow().
+- Fixed type(out) is tuple → isinstance(out, tuple) in ModelData.connectivity_workflow().
+- Fixed empty-array guard in Corr_cross_correlation_Estimator.calculate_conn().
+- Fixed typo classifers → classifiers in setup.py.
+- Fixed duplicate test method test_processed_channel_names_dash in tests.py.
+- Fixed NumPy ≥ 1.25 DeprecationWarning: Y[f==0] → Y[f==0][0] in obtain_frequency_bands().
+- Fixed NumPy ≥ 1.25 DeprecationWarning: lag_0 extraction uses np.where()[0][0].
+- Fixed invalid escape sequence \s → r"\s" in set_montage() CSV delimiter.
+- Added CLAUDE.md with architecture reference for contributors.
+
 0.1.12 (31/03/2021)
 ------------------
 - Removed exclude option for VHDR files
