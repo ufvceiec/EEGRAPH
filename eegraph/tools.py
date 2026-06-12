@@ -491,6 +491,10 @@ def calculate_connectivity_single_channel_with_bands(data_intervals, sample_rate
 def compute_graph_metrics(G):
     """Compute graph-theoretic metrics on a single NetworkX graph.
 
+    All metrics are computed on an undirected, self-loop-free copy of the
+    graph regardless of whether the original is directed (e.g. DTF) or
+    contains self-loops (e.g. single-channel measures).
+
     Parameters
     ----------
     G : NetworkX Graph or DiGraph
@@ -499,36 +503,162 @@ def compute_graph_metrics(G):
     Returns
     -------
     metrics : dict
-        Dictionary with the following keys:
+        Dictionary with the following keys.
 
-        Network-level scalars
-        ---------------------
-        density : float
-            Fraction of possible edges that are present. Range [0, 1].
-        transitivity : float
-            Global clustering coefficient (ratio of triangles to triplets). Range [0, 1].
-        average_clustering : float
-            Mean local clustering coefficient across nodes. Range [0, 1].
-        global_efficiency : float
-            Average inverse shortest path length; robust to disconnected graphs. Range [0, 1].
-        local_efficiency : float
-            Average efficiency of node neighbourhoods. Range [0, 1].
-        average_path_length : float
-            Mean shortest path length. Computed on the largest connected component
-            when the graph is disconnected. NaN if graph has fewer than 2 connected nodes.
-        degree_assortativity : float
-            Pearson correlation of degrees of connected node pairs. Range [-1, 1].
-            NaN if undefined (e.g. all nodes have the same degree).
+        ── Network-level scalars ─────────────────────────────────────────────
+
+        density : float  [0, 1]
+            Fraction of all possible electrode pairs that share an active
+            connection above the chosen threshold.
+
+            *Brain connectivity interpretation*: Overall level of
+            synchronisation in the network. Higher density is observed during
+            cognitive tasks or epileptic seizures (hyper-synchrony). Abnormally
+            low density is reported in Alzheimer's disease and disorders of
+            consciousness. Because density depends on the threshold, always
+            compare recordings using the same threshold value.
+
+        transitivity : float  [0, 1]
+            Global clustering coefficient — ratio of closed triangles to all
+            connected triplets across the whole network.
+
+            *Brain connectivity interpretation*: Captures the tendency of
+            electrodes to form tightly interconnected local clusters (functional
+            modules). The healthy resting brain has high transitivity, reflecting
+            local specialisation. Reduced transitivity has been linked to
+            schizophrenia and TBI; elevated transitivity appears in some forms
+            of epilepsy.
+
+        average_clustering : float  [0, 1]
+            Mean of each node's local clustering coefficient, weighted by edge
+            strength.
+
+            *Brain connectivity interpretation*: Similar to transitivity but
+            gives equal weight to every electrode regardless of degree. Useful
+            for detecting localised changes in functional modularity. Decreased
+            average clustering in the alpha band has been reported in
+            Alzheimer's disease and Parkinson's disease.
+
+        global_efficiency : float  [0, 1]
+            Average inverse shortest path length over all node pairs.
+            Unlike average_path_length, this measure is well-defined for
+            disconnected graphs (isolated pairs contribute 0).
+
+            *Brain connectivity interpretation*: Reflects how efficiently
+            information is integrated across the whole brain (parallel
+            processing capacity). The healthy brain maintains high global
+            efficiency. Reductions are a consistent finding in Alzheimer's
+            disease, multiple sclerosis, and following stroke. An increase
+            may indicate seizure-related hyper-connectivity.
+
+        local_efficiency : float  [0, 1]
+            Average global efficiency computed within each node's immediate
+            neighbourhood (i.e. efficiency of information transfer when that
+            node is removed).
+
+            *Brain connectivity interpretation*: Measures the fault tolerance
+            and local information-processing capacity of the network. High
+            local efficiency means the network remains functional even if
+            individual electrodes are compromised. Decreased local efficiency
+            has been observed in Parkinson's disease (particularly in beta
+            band) and in ageing.
+
+        average_path_length : float  [≥ 1]
+            Mean number of edges along the shortest path between all pairs of
+            nodes. Computed on the largest connected component when the graph
+            is disconnected; NaN if the graph has fewer than 2 connected nodes.
+
+            *Brain connectivity interpretation*: Reflects global integration —
+            how rapidly activity in one brain region can influence another.
+            The healthy brain shows short path lengths (rapid integration).
+            Increased path length indicates fragmented or less integrated
+            connectivity and is reported in Alzheimer's disease, depression,
+            and following white-matter lesions. Note: compare together with
+            average_clustering via small_world_sigma.
+
+        degree_assortativity : float  [-1, 1]
+            Pearson correlation between the degrees of connected node pairs.
+            Positive values: high-degree nodes tend to connect to other
+            high-degree nodes. Negative values: hubs connect to low-degree
+            nodes (disassortative). NaN if undefined.
+
+            *Brain connectivity interpretation*: Most biological brain networks
+            are disassortative (negative values) — hub electrodes connect to
+            peripheral ones, which supports robustness and integration. A shift
+            towards assortativity (hubs connecting only to hubs) may reflect
+            pathological reorganisation, such as that seen in epilepsy or
+            following focal lesions.
+
         small_world_sigma : float
-            Small-world coefficient σ = (C / C_rand) / (L / L_rand).
-            σ > 1 indicates small-world organisation. NaN if not computable.
+            Small-world coefficient σ = (C / C_rand) / (L / L_rand), where
+            C_rand ≈ ⟨k⟩/n and L_rand ≈ ln(n)/ln(⟨k⟩) are analytical
+            approximations for a random graph with the same size and mean
+            degree. σ > 1 indicates small-world organisation.
+            NaN if not computable (e.g. too few edges or disconnected).
 
-        Node-level dicts  {node_label: value}
-        --------------------------------------
-        degree_centrality : dict
-        betweenness_centrality : dict
-        eigenvector_centrality : dict
-            NaN per node if power iteration fails to converge.
+            *Brain connectivity interpretation*: The healthy brain operates as
+            a small-world network (high clustering + short path lengths),
+            striking an optimal balance between local specialisation and global
+            integration. σ significantly above 1 has been confirmed in resting
+            EEG across all frequency bands. Loss of small-world topology
+            (σ approaching 1) is a robust biomarker reported in Alzheimer's
+            disease, schizophrenia, epilepsy, and major depression.
+
+        ── Node-level dicts  {electrode_label: value} ───────────────────────
+
+        degree_centrality : dict  [0, 1]
+            Fraction of other electrodes each node is directly connected to.
+
+            *Brain connectivity interpretation*: Identifies electrodes with the
+            largest number of active connections. Frontal and parietal hub
+            electrodes typically show the highest degree centrality in the
+            healthy resting brain. Shifts in degree centrality (e.g. from
+            frontal to temporal regions) can indicate pathological
+            reorganisation in epilepsy or dementia.
+
+        betweenness_centrality : dict  [0, 1]
+            Fraction of all shortest paths (across the full graph) that pass
+            through each node, weighted by edge strength.
+
+            *Brain connectivity interpretation*: Identifies bottleneck
+            electrodes — those that mediate communication between otherwise
+            distant brain regions. High betweenness centrality marks
+            functional hubs. Loss of hub status in key regions (e.g. precuneus,
+            posterior cingulate in Alzheimer's) or the emergence of new hubs
+            (e.g. perilesional areas after stroke) are clinically meaningful
+            signatures.
+
+        eigenvector_centrality : dict  [0, 1]
+            A node's influence weighted by the centrality of its neighbours —
+            being connected to important nodes increases a node's own
+            centrality. NaN per node if power iteration fails to converge.
+
+            *Brain connectivity interpretation*: Captures global hub status
+            more sensitively than degree centrality because it accounts for
+            the quality, not just the quantity, of connections. Electrodes
+            overlying the default mode network (medial frontal, posterior
+            parietal) show high eigenvector centrality at rest. Reduced
+            eigenvector centrality in these regions has been associated with
+            cognitive decline and Alzheimer's disease.
+
+    Notes
+    -----
+    When comparing metrics across subjects or conditions, ensure that the
+    same connectivity measure, frequency band, and threshold are used
+    throughout, as all graph metrics are sensitive to network density.
+    Proportional thresholding (fixing density across recordings) is
+    recommended for group-level analyses.
+
+    References
+    ----------
+    Stam, C.J. et al. (2007). Small-world networks and functional connectivity
+        in Alzheimer's disease. *Cerebral Cortex*, 17, 92–99.
+    Bassett, D.S. & Bullmore, E. (2006). Small-world brain networks.
+        *The Neuroscientist*, 12(6), 512–523.
+    Rubinov, M. & Sporns, O. (2010). Complex network measures of brain
+        connectivity: uses and interpretations. *NeuroImage*, 52(3), 1059–1069.
+    Latora, V. & Marchiori, M. (2001). Efficient behavior of small-world
+        networks. *Physical Review Letters*, 87(19), 198701.
     """
     # Work on an undirected, self-loop-free copy for all metrics
     G_und = G.to_undirected() if nx.is_directed(G) else G
