@@ -1,3 +1,10 @@
+# Changelog
+
+All notable changes to EEGraph are documented here.
+
+---
+
+```
 Change Log
 ==========
 
@@ -30,59 +37,57 @@ Change Log
 
 0.1.11 (06/09/2021)
 ------------------
-- Fixing returned connectivity matrix for single channel connectivity measures (Power Spectrum, Spectral Entropy, Shannon Entropy). 
-- Graph visualization with single channel connectivity measures now include the value for each node. 
+- Fixing returned connectivity matrix for single channel connectivity measures (Power Spectrum, Spectral Entropy, Shannon Entropy).
+- Graph visualization with single channel connectivity measures now include the value for each node.
 
 
 0.1.10 (06/09/2021)
 ------------------
-- Fixing issue involving frequency bands. 
+- Fixing issue involving frequency bands.
 
 0.1.9 (05/05/2021)
 ------------------
 - Adding custom input percentage threshold for spectral entropy, power spectrum and shannon entropy.
-- Updating DTF to generate directed graphs. 
+- Updating DTF to generate directed graphs.
 
 0.1.8 (05/04/2021)
 ------------------
 - Updating Corrected cross-correlation default threshold.
-- Rescaling data for Corrected cross-correlation. 
+- Rescaling data for Corrected cross-correlation.
 
 0.1.7 (04/22/2021)
 ------------------
-- Updating Entropy depedency to Antropy, all dependencies are now installed with pip. 
+- Updating Entropy depedency to Antropy, all dependencies are now installed with pip.
 - Updating np.complex to complex, deprecation warning numpy 1.20.
 
 0.1.6 (03/25/2021)
 ------------------
-- Adding the option to include a electrode montage file for channel labels, in method load_data(). 
-- Adding warning if a channel label is not a recognize electrode position, it will be ignored for visualization. 
+- Adding the option to include a electrode montage file for channel labels, in method load_data().
+- Adding warning if a channel label is not a recognize electrode position, it will be ignored for visualization.
 
 0.1.5 (02/26/2021)
 ------------------
-- Fixing issue with spectral entropy that returned empty graph, when the top 25% top values are the same. 
+- Fixing issue with spectral entropy that returned empty graph, when the top 25% top values are the same.
 
 0.1.4 (02/24/2021)
 ------------------
 - Fixing some issues with dtf connectivity.
-- Rounding printed intervals. 
-- Adding warning when a frequency band is empty.  
+- Rounding printed intervals.
+- Adding warning when a frequency band is empty.
 
 0.1.3 (02/13/2021)
 ------------------
-- Fixing bug that causes an increase in runtime when a single interval is used in 'modelate' method. 
+- Fixing bug that causes an increase in runtime when a single interval is used in 'modelate' method.
 
 0.1.2 (02/11/2021)
 ------------------
-- Fixing bug that causes an increase in runtime when a single interval is used in 'modelate' method. 
+- Fixing bug that causes an increase in runtime when a single interval is used in 'modelate' method.
 
 0.1.1 (02/10/2021)
 ------------------
-- Fixing error 'Cant convert complex to float' in Squared Coherence connectivity measure. 
+- Fixing error 'Cant convert complex to float' in Squared Coherence connectivity measure.
 
 0.1.0 (02/02/2021)
 ------------------
 - First Release
-
-
-
+```

@@ -122,6 +122,17 @@ graphs, connectivity_matrix = G.modelate(
 - **`int`**: uniform window length in seconds — `window_size=2` splits the EEG into 2-second segments.
 - **`list`**: explicit interval boundaries in seconds — `window_size=[0, 3, 8]` creates two intervals: [0–3 s] and [3–8 s]. The first value must be `0`.
 
+### Compute graph metrics
+
+```python
+metrics = G.compute_metrics(graphs)
+
+for key, m in metrics.items():
+    print(f"Graph {key}: density={m['density']:.3f}, "
+          f"avg_clustering={m['average_clustering']:.3f}, "
+          f"edges={m['edges']}")
+```
+
 ### Visualize graph
 ```python
 G.visualize_html(graphs[0], 'graph_1')   # saves graph_1_plot.html and opens in browser
