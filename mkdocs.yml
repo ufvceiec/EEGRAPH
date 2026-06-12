@@ -1,0 +1,86 @@
+site_name: EEGraph
+site_description: An open-source Python library for modelling electroencephalograms as graphs
+site_author: CEIEC — Universidad Francisco de Vitoria
+site_url: https://ufvceiec.github.io/EEGRAPH/
+repo_url: https://github.com/ufvceiec/EEGRAPH
+repo_name: ufvceiec/EEGRAPH
+edit_uri: edit/develop-refactor/docs/
+
+theme:
+  name: material
+  logo: assets/eegraph-logo.png
+  favicon: assets/eegraph-logo.png
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+    - content.code.annotate
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - attr_list
+  - tables
+  - footnotes
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [.]
+          options:
+            show_source: true
+            show_root_heading: true
+            heading_level: 2
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting_started/installation.md
+    - Quick Start: getting_started/quickstart.md
+  - User Guide:
+    - Loading EEG Data: user_guide/loading_data.md
+    - Connectivity Measures: user_guide/connectivity_measures.md
+    - Graph Metrics: user_guide/graph_metrics.md
+    - Visualization: user_guide/visualization.md
+    - Window Size & Epochs: user_guide/windowing.md
+  - API Reference:
+    - Graph: api/graph.md
+    - Tools: api/tools.md
+  - Changelog: changelog.md
+  - Contributing: contributing.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/ufvceiec/EEGRAPH
+  version:
+    provider: mike
