@@ -14,14 +14,14 @@ class ModelData:
         
     def connectivity_workflow(self, bands, window_size, threshold):
         #If the user assigns a new threshold
-        if(threshold) is not None:
+        if threshold is not None:
             self.threshold = threshold
             
         self.connectivity_matrix = self._strategy.calculate_connectivity_workflow(self, bands, window_size)
         print('\nThreshold:', self.threshold)
         
         out = self._strategy.make_graph_workflow(self)
-        if(type(out) is tuple):
+        if isinstance(out, tuple):
             self.connectivity_graphs = out[0]
             self.connectivity_matrix = out[1]
         else:

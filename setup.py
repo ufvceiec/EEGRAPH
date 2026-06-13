@@ -22,12 +22,12 @@ if __name__ == "__main__":
 
 setup(
     name='EEGRAPH',
-    version='0.1.16',
+    version='0.1.17',
     description='',
     url='https://github.com/ufvceiec/EEGRAPH',
     author='CEIEC',
     license= 'GPL-3.0',
-    classifers=classifiers,
+    classifiers=classifiers,
     keywords='',
     packages=find_packages(),
     install_requires=install_requires,
