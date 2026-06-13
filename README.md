@@ -41,7 +41,7 @@ pip install EEGRAPH
 ## Functions
 
 ### Documentation
-[EEGraph documentation](https://github.com/ufvceiec/EEGRAPH/wiki) is available online. [Examples](https://github.com/ufvceiec/EEGRAPH/blob/develop-refactor/Examples/EEGraph_Example.ipynb) of usage are also available.
+[EEGraph documentation](https://ufvceiec.github.io/EEGRAPH/) is available online. [Examples] (https://github.com/ufvceiec/EEGRAPH/blob/develop-refactor/Examples/EEGraph_Example.ipynb) of usage are also available.
 
 ### Importing EEG data
 
@@ -73,8 +73,6 @@ pip install EEGRAPH
 | Directed Transfer Function (DTF) | `dtf` | Frequency | Yes |
 | Power Spectrum | `power_spectrum` | Frequency | Yes |
 | Spectral Entropy | `spectral_entropy` | Frequency | Yes |
-
-Visit the [documentation](https://github.com/ufvceiec/EEGRAPH/wiki/Modelate-Data) for default thresholds and detailed parameter descriptions.
 
 ## Usage
 
