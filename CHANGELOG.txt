@@ -1,6 +1,19 @@
 Change Log
 ==========
 
+0.2.0 (2026-06-19)
+------------------
+- Added 6 new connectivity measures: AEC, AEC_orth, Mutual_information,
+  Sync_likelihood, Granger_causality, Transfer_entropy.
+- Added 4 new graph-theoretic metrics: modularity, assortativity,
+  transitivity, rich_club_coefficient (via compute_graph_metrics()).
+- Added GitHub Actions CI workflow replacing deprecated Travis CI.
+- Added GitHub Actions docs workflow (MkDocs Material site).
+- Fixed numba version constraint (>=0.60) for NumPy 2.x compatibility.
+- Fixed logo image URL in README (raw.githubusercontent.com).
+- Fixed setup.py: updated author, URL, python_requires, added extras_require.
+- Updated requirements.txt: relaxed pinned versions to >= constraints.
+
 0.1.17 (2026-06-12)
 ------------------
 - Fixed re_scaling(): result of df.sub() was discarded; now correctly assigned back.

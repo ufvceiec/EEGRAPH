@@ -30,7 +30,7 @@ if __name__ == "__main__":
 
 setup(
     name='EEGRAPH',
-    version='0.1.17',
+    version='0.2.0',
     description='Open-source Python library for modeling EEGs as graphs',
     url='https://github.com/albertonogales/EEGRAPH',
     author='Alberto Nogales, Álvaro José García-Tejedor',
