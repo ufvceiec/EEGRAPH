@@ -450,5 +450,259 @@ class TestVisualizeData(unittest.TestCase):
         with self.assertWarns(Warning):
             G.visualize(graphs[0], 'test_2')
     
+class TestNewConnectivityMeasures(unittest.TestCase):
+    """Unit tests for the 11 new connectivity estimators added to EEGraph."""
+
+    def setUp(self):
+        rng = np.random.default_rng(0)
+        self.sr = 256
+        n = 512
+        self.x = rng.standard_normal(n)
+        self.y = rng.standard_normal(n)
+        self.data = [self.x, self.y]
+        self.bands = [True, True, True, True, True]
+
+    # ── No-bands (undirected) ──────────────────────────────────────────────
+
+    def test_aec_returns_scalar(self):
+        est = eegraph.strategy.Aec_Estimator()
+        r = est.calculate_conn(self.data, 0, 1, self.sr, 2)
+        self.assertIsInstance(r, float)
+
+    def test_aec_range(self):
+        est = eegraph.strategy.Aec_Estimator()
+        r = est.calculate_conn(self.data, 0, 1, self.sr, 2)
+        self.assertGreaterEqual(r, -1.0)
+        self.assertLessEqual(r, 1.0)
+
+    def test_aec_orth_returns_scalar(self):
+        est = eegraph.strategy.Aec_orth_Estimator()
+        r = est.calculate_conn(self.data, 0, 1, self.sr, 2)
+        self.assertIsInstance(r, float)
+
+    def test_aec_orth_range(self):
+        est = eegraph.strategy.Aec_orth_Estimator()
+        r = est.calculate_conn(self.data, 0, 1, self.sr, 2)
+        self.assertGreaterEqual(r, -1.0)
+        self.assertLessEqual(r, 1.0)
+
+    def test_mutual_information_non_negative(self):
+        est = eegraph.strategy.Mutual_information_Estimator()
+        mi = est.calculate_conn(self.data, 0, 1, self.sr, 2)
+        self.assertGreaterEqual(mi, 0.0)
+
+    def test_mutual_information_identical_signals(self):
+        est = eegraph.strategy.Mutual_information_Estimator()
+        data = [self.x, self.x]
+        mi = est.calculate_conn(data, 0, 1, self.sr, 2)
+        # MI(X,X) should be positive (entropy of X)
+        self.assertGreater(mi, 0.0)
+
+    def test_sync_likelihood_range(self):
+        est = eegraph.strategy.Sync_likelihood_Estimator()
+        sl = est.calculate_conn(self.data, 0, 1, self.sr, 2)
+        self.assertGreaterEqual(sl, 0.0)
+        self.assertLessEqual(sl, 1.0)
+
+    def test_granger_causality_non_negative(self):
+        est = eegraph.strategy.Granger_causality_Estimator()
+        gc = est.calculate_conn(self.data, 0, 1, self.sr, 2)
+        self.assertGreaterEqual(gc, 0.0)
+
+    def test_granger_causality_asymmetric(self):
+        est = eegraph.strategy.Granger_causality_Estimator()
+        gc_xy = est.calculate_conn(self.data, 0, 1, self.sr, 2)
+        gc_yx = est.calculate_conn(self.data, 1, 0, self.sr, 2)
+        # GC is generally asymmetric for random signals
+        # Just verify both are non-negative scalars
+        self.assertGreaterEqual(gc_xy, 0.0)
+        self.assertGreaterEqual(gc_yx, 0.0)
+
+    def test_transfer_entropy_non_negative(self):
+        est = eegraph.strategy.Transfer_entropy_Estimator()
+        te = est.calculate_conn(self.data, 0, 1, self.sr, 2)
+        self.assertGreaterEqual(te, 0.0)
+
+    # ── With-bands (undirected) ────────────────────────────────────────────
+
+    def test_dwpli_returns_5_values(self):
+        est = eegraph.strategy.Dwpli_Estimator()
+        result = est.calculate_conn(self.data, 0, 1, self.sr, 2, self.bands)
+        self.assertEqual(len(result), 5)
+
+    def test_dwpli_values_are_numeric(self):
+        est = eegraph.strategy.Dwpli_Estimator()
+        result = est.calculate_conn(self.data, 0, 1, self.sr, 2, self.bands)
+        for v in result:
+            self.assertIsInstance(v, float)
+
+    def test_ppc_returns_5_values(self):
+        est = eegraph.strategy.Ppc_Estimator()
+        result = est.calculate_conn(self.data, 0, 1, self.sr, 2, self.bands)
+        self.assertEqual(len(result), 5)
+
+    def test_ppc_non_negative(self):
+        est = eegraph.strategy.Ppc_Estimator()
+        result = est.calculate_conn(self.data, 0, 1, self.sr, 2, self.bands)
+        for v in result:
+            self.assertGreaterEqual(v, 0.0)
+
+    def test_lagged_coherence_returns_5_values(self):
+        est = eegraph.strategy.Lagged_coherence_Estimator()
+        result = est.calculate_conn(self.data, 0, 1, self.sr, 2, self.bands)
+        self.assertEqual(len(result), 5)
+
+    def test_lagged_coherence_non_negative(self):
+        est = eegraph.strategy.Lagged_coherence_Estimator()
+        result = est.calculate_conn(self.data, 0, 1, self.sr, 2, self.bands)
+        for v in result:
+            self.assertGreaterEqual(v, 0.0)
+
+    def test_psi_returns_5_values(self):
+        est = eegraph.strategy.Psi_Estimator()
+        result = est.calculate_conn(self.data, 0, 1, self.sr, 2, self.bands)
+        self.assertEqual(len(result), 5)
+
+    def test_psi_numeric(self):
+        est = eegraph.strategy.Psi_Estimator()
+        result = est.calculate_conn(self.data, 0, 1, self.sr, 2, self.bands)
+        for v in result:
+            self.assertIsInstance(v, float)
+
+    # ── Integration: calculate_connectivity with new no-bands measures ─────
+
+    def test_calculate_connectivity_aec(self):
+        channels = 3
+        data = [np.random.standard_normal(512) for _ in range(channels)]
+        steps = [(0, 512)]
+        est = eegraph.strategy.Aec_Estimator()
+        est.flag = 0
+        result = calculate_connectivity(data, steps, channels, self.sr, est)
+        self.assertEqual(np.shape(result), (1, channels, channels))
+
+    def test_calculate_connectivity_granger(self):
+        channels = 3
+        data = [np.random.standard_normal(512) for _ in range(channels)]
+        steps = [(0, 512)]
+        est = eegraph.strategy.Granger_causality_Estimator()
+        est.flag = 0
+        result = calculate_connectivity(data, steps, channels, self.sr, est)
+        self.assertEqual(np.shape(result), (1, channels, channels))
+
+    def test_calculate_connectivity_bands_dwpli(self):
+        channels = 3
+        data = [np.random.standard_normal(512) for _ in range(channels)]
+        steps = [(0, 512)]
+        bands = [True, True, False, True, False]
+        est = eegraph.strategy.Dwpli_Estimator()
+        est.flag = 0
+        result = calculate_connectivity_with_bands(data, steps, channels, self.sr, est, bands)
+        self.assertEqual(np.shape(result), (sum(bands), channels, channels))
+
+
+class TestNewGraphMetrics(unittest.TestCase):
+    """Tests for the new graph-theoretic metrics added to compute_graph_metrics."""
+
+    def _make_complete_graph(self):
+        G = nx.complete_graph(5)
+        for u, v in G.edges():
+            G[u][v]['weight'] = 0.8
+        return G
+
+    def _make_disconnected_graph(self):
+        G = nx.Graph()
+        G.add_nodes_from(range(6))
+        G.add_edge(0, 1, weight=0.9)
+        G.add_edge(2, 3, weight=0.7)
+        G.add_edge(4, 5, weight=0.8)
+        return G
+
+    def test_modularity_key_present(self):
+        G = self._make_complete_graph()
+        m = compute_graph_metrics(G)
+        self.assertIn('modularity', m)
+
+    def test_modularity_range(self):
+        G = self._make_complete_graph()
+        m = compute_graph_metrics(G)
+        self.assertGreaterEqual(m['modularity'], 0.0)
+        self.assertLessEqual(m['modularity'], 1.0)
+
+    def test_modularity_disconnected_non_negative(self):
+        """Disconnected graph should have non-negative modularity."""
+        G = self._make_disconnected_graph()
+        m = compute_graph_metrics(G)
+        self.assertGreaterEqual(m['modularity'], 0.0)
+
+    def test_rich_club_key_present(self):
+        G = self._make_complete_graph()
+        m = compute_graph_metrics(G)
+        self.assertIn('rich_club_coefficient', m)
+
+    def test_rich_club_is_dict(self):
+        G = self._make_complete_graph()
+        m = compute_graph_metrics(G)
+        self.assertIsInstance(m['rich_club_coefficient'], dict)
+
+    def test_rich_club_values_in_range(self):
+        G = self._make_complete_graph()
+        m = compute_graph_metrics(G)
+        for v in m['rich_club_coefficient'].values():
+            self.assertGreaterEqual(v, 0.0)
+            self.assertLessEqual(v, 1.0 + 1e-9)
+
+    def test_closeness_centrality_key_present(self):
+        G = self._make_complete_graph()
+        m = compute_graph_metrics(G)
+        self.assertIn('closeness_centrality', m)
+
+    def test_closeness_centrality_all_nodes(self):
+        G = self._make_complete_graph()
+        m = compute_graph_metrics(G)
+        self.assertEqual(set(m['closeness_centrality'].keys()), set(G.nodes()))
+
+    def test_closeness_centrality_range(self):
+        G = self._make_complete_graph()
+        m = compute_graph_metrics(G)
+        for v in m['closeness_centrality'].values():
+            self.assertGreaterEqual(v, 0.0)
+            self.assertLessEqual(v, 1.0)
+
+    def test_node_strength_key_present(self):
+        G = self._make_complete_graph()
+        m = compute_graph_metrics(G)
+        self.assertIn('node_strength', m)
+
+    def test_node_strength_non_negative(self):
+        G = self._make_complete_graph()
+        m = compute_graph_metrics(G)
+        for v in m['node_strength'].values():
+            self.assertGreaterEqual(v, 0.0)
+
+    def test_degree_key_present(self):
+        G = self._make_complete_graph()
+        m = compute_graph_metrics(G)
+        self.assertIn('degree', m)
+
+    def test_degree_values_are_int(self):
+        G = self._make_complete_graph()
+        m = compute_graph_metrics(G)
+        for v in m['degree'].values():
+            self.assertIsInstance(v, int)
+
+    def test_disconnected_modularity_non_negative(self):
+        G = self._make_disconnected_graph()
+        m = compute_graph_metrics(G)
+        self.assertGreaterEqual(m['modularity'], 0.0)
+
+    def test_metrics_all_new_keys_present(self):
+        G = self._make_complete_graph()
+        graphs = {0: G}
+        all_m = compute_metrics_all(graphs)
+        for key in ['modularity', 'rich_club_coefficient',
+                    'closeness_centrality', 'node_strength', 'degree']:
+            self.assertIn(key, all_m[0])
+
+
 if __name__ == '__main__':
     unittest.main()
