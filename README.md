@@ -5,7 +5,7 @@
 [![GP3 License](https://img.shields.io/github/license/ufvceiec/EEGRAPH.svg)](https://github.com/ufvceiec/EEGRAPH/blob/feature/graph-metrics/LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11-blue.svg)](https://www.python.org/downloads/)
 [![PyPI](https://img.shields.io/pypi/v/EEGRAPH?color=blue)](https://pypi.org/project/EEGRAPH/)
-[![Tests](https://github.com/ufvceiec/EEGRAPH/actions/workflows/tests.yml/badge.svg)](https://github.com/ufvceiec/EEGRAPH/actions/workflows/tests.yml)
+[![Tests](https://github.com/ufvceiec/EEGRAPH/actions/workflows/tests.yml/badge.svg?branch=feature/graph-metrics)](https://github.com/ufvceiec/EEGRAPH/actions/workflows/tests.yml)
 
 EEGraph is a Python library to model electroencephalograms (EEGs) as graphs, enabling the analysis of brain connectivity between different brain areas. It has applications in the study of neurological diseases like Parkinson's or epilepsy. The graph can be exported as a NetworkX graph-like object or graphically visualized as an interactive HTML plot.
 
