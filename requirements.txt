@@ -4,7 +4,7 @@ mne>=1.2
 networkx>=2.5
 plotly>=5.0
 scipy>=1.7
-numba>=0.60    # 0.60+ supports NumPy 2.x; required by antropy
+numba>=0.65    # 0.65+ supports NumPy 2.4; required by antropy
 antropy>=0.1.4
 kaleido==0.2.1
 
