@@ -1,6 +1,11 @@
 import numpy as np
 import pandas as pd
-import scot
+try:
+    import scot
+    _SCOT_AVAILABLE = True
+except ImportError:
+    scot = None  # type: ignore[assignment]
+    _SCOT_AVAILABLE = False
 from scipy import signal
 from itertools import combinations
 import networkx as nx
@@ -10,10 +15,37 @@ import warnings
 
 input_format = {'edf', 'gdf', 'vhdr', 'cnt', 'bdf', 'egi', 'mff', 'nxe'}
 
-connectivity_measures = {'cross_correlation': 'Cross_correlation_Estimator', 'pearson_correlation': 'Pearson_correlation_Estimator', 'squared_coherence': 'Squared_coherence_Estimator',
-                         'imag_coherence': 'Imag_coherence_Estimator', 'corr_cross_correlation': 'Corr_cross_correlation_Estimator', 'wpli': 'Wpli_Estimator', 
-                         'plv': 'Plv_Estimator', 'pli': 'Pli_No_Bands_Estimator', 'pli_bands': 'Pli_Bands_Estimator', 'dtf': 'Dtf_Estimator', 'power_spectrum': 'Power_spectrum_Estimator',
-                         'spectral_entropy': 'Spectral_entropy_Estimator', 'shannon_entropy': 'Shannon_entropy_Estimator'}
+connectivity_measures = {
+    # ── Original measures ────────────────────────────────────────────────────
+    'cross_correlation':        'Cross_correlation_Estimator',
+    'pearson_correlation':      'Pearson_correlation_Estimator',
+    'squared_coherence':        'Squared_coherence_Estimator',
+    'imag_coherence':           'Imag_coherence_Estimator',
+    'corr_cross_correlation':   'Corr_cross_correlation_Estimator',
+    'wpli':                     'Wpli_Estimator',
+    'plv':                      'Plv_Estimator',
+    'pli':                      'Pli_No_Bands_Estimator',
+    'pli_bands':                'Pli_Bands_Estimator',
+    'dtf':                      'Dtf_Estimator',
+    'power_spectrum':           'Power_spectrum_Estimator',
+    'spectral_entropy':         'Spectral_entropy_Estimator',
+    'shannon_entropy':          'Shannon_entropy_Estimator',
+    # ── New undirected measures (no bands) ───────────────────────────────────
+    'aec':                      'Aec_Estimator',
+    'aec_orth':                 'Aec_orth_Estimator',
+    'mutual_information':       'Mutual_information_Estimator',
+    'sync_likelihood':          'Sync_likelihood_Estimator',
+    # ── New undirected measures (with bands) ─────────────────────────────────
+    'dwpli':                    'Dwpli_Estimator',
+    'ppc':                      'Ppc_Estimator',
+    'lagged_coherence':         'Lagged_coherence_Estimator',
+    # ── New directed measures (no bands) ────────────────────────────────────
+    'granger_causality':        'Granger_causality_Estimator',
+    'transfer_entropy':         'Transfer_entropy_Estimator',
+    # ── New directed measures (with bands) ───────────────────────────────────
+    'pdc':                      'Pdc_Estimator',
+    'psi':                      'Psi_Estimator',
+}
 
 def search_input(values, searchFor):
     if searchFor in values:
@@ -420,6 +452,11 @@ def instantaneous_phase(bands):
 
 
 def calculate_dtf(data_intervals, steps, channels, sample_rate, bands, flag):
+    if not _SCOT_AVAILABLE:
+        raise ImportError(
+            "The DTF connectivity measure requires 'scot'. "
+            "Install it with: pip install scot==0.2.1 \"scipy<1.10\""
+        )
     num_bands = sum(bands)
     intervals = (len(steps)) - flag
     matrix = np.zeros(shape=((intervals * num_bands), channels, channels))
@@ -457,6 +494,58 @@ def calculate_dtf(data_intervals, steps, channels, sample_rate, bands, flag):
                             matrix[(k * num_bands) + r][x,y] = 0
                         r+=1                  
     return matrix
+
+def calculate_pdc(data_intervals, steps, channels, sample_rate, bands, flag):
+    """Compute the PDC connectivity matrix using a MVAR model (via scot).
+    Raises ImportError if scot is not installed.
+
+    Partial Directed Coherence measures the direct causal influence from one
+    channel to another at each frequency. The matrix entry PDC[i,j] represents
+    the direct influence of channel *j* on channel *i*.
+
+    Parameters mirror those of :func:`calculate_dtf`.
+    """
+    if not _SCOT_AVAILABLE:
+        raise ImportError(
+            "The PDC connectivity measure requires 'scot'. "
+            "Install it with: pip install scot==0.2.1 \"scipy<1.10\""
+        )
+    num_bands = sum(bands)
+    intervals = (len(steps)) - flag
+    matrix = np.zeros(shape=((intervals * num_bands), channels, channels))
+    start, stop = 0, channels
+
+    model_order = max(1, channels - 5) if channels > 6 else 1
+    ws = scot.Workspace(
+        {'model_order': model_order},
+        reducedim='no_pca',
+        nfft=int(sample_rate / 2),
+        fs=sample_rate,
+    )
+    f = np.arange(0, int(sample_rate / 2))
+
+    for k in range(intervals):
+        if k != 0:
+            start = stop
+            stop += channels
+        data = [data_intervals[h] for h in range(start, stop)]
+        ws.set_data(data)
+        ws.do_mvarica()
+        ws.fit_var()
+        results = ws.get_connectivity('PDC')
+
+        for x, i in enumerate(range(start, stop)):
+            for y, j in enumerate(range(start, stop)):
+                delta, theta, alpha, beta, gamma = frequency_bands(f, results[x][y])
+                r = 0
+                for z, item in enumerate([delta, theta, alpha, beta, gamma]):
+                    if bands[z]:
+                        matrix[(k * num_bands) + r][x, y] = (
+                            item.mean() if len(item) != 0 else 0
+                        )
+                        r += 1
+    return matrix
+
 
 def calculate_connectivity_single_channel(data_intervals, sample_rate, connectivity):
     values = []
@@ -731,6 +820,39 @@ def compute_graph_metrics(G):
     except nx.PowerIterationFailedConvergence:
         logging.warning('Eigenvector centrality did not converge. Returning NaN for all nodes.')
         metrics['eigenvector_centrality'] = {node: float('nan') for node in G_clean.nodes()}
+
+    metrics['closeness_centrality'] = nx.closeness_centrality(G_clean)
+
+    metrics['node_strength'] = {
+        node: float(sum(d.get('weight', 1.0) for _, d in G_clean[node].items()))
+        for node in G_clean.nodes()
+    }
+
+    metrics['degree'] = dict(G_clean.degree())
+
+    # ── Modularity ────────────────────────────────────────────────────────────
+    if G_clean.number_of_edges() > 0:
+        try:
+            communities = nx.community.greedy_modularity_communities(
+                G_clean, weight='weight'
+            )
+            metrics['modularity'] = float(
+                nx.community.modularity(G_clean, communities, weight='weight')
+            )
+        except Exception:
+            metrics['modularity'] = float('nan')
+    else:
+        metrics['modularity'] = 0.0
+
+    # ── Rich-club coefficient ─────────────────────────────────────────────────
+    if G_clean.number_of_nodes() >= 2:
+        try:
+            rcc = nx.rich_club_coefficient(G_clean, normalized=False)
+            metrics['rich_club_coefficient'] = {int(k): float(v) for k, v in rcc.items()}
+        except Exception:
+            metrics['rich_club_coefficient'] = {}
+    else:
+        metrics['rich_club_coefficient'] = {}
 
     return metrics
 
