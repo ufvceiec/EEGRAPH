@@ -1049,7 +1049,7 @@ def draw_graph(G):
 
     fig = go.Figure(data=(edge_trace + [node_trace,  eweights_trace_hover, eweights_trace_markers]),
                     layout=go.Layout(
-                        titlefont_size=16,
+                        title=dict(font=dict(size=16)),
                         showlegend=False,
                         margin=dict(b=40, l=0, r=350, t=30),
                         xaxis_visible=False,

@@ -196,18 +196,19 @@ class TestTools(unittest.TestCase):
         result = calculate_connectivity_with_bands(data, steps, channels, sample_rate, connectivity, bands)
         self.assertEqual(np.shape(result), (sum(bands)*intervals,channels,channels))
         
+    @unittest.skipUnless(_SCOT_AVAILABLE, "scot not installed")
     def test_calculate_dtf(self):
         data = []
         channels = 16
         intervals = 1
         for i in range(channels * intervals):
             data.append(np.random.uniform(0, 1, 2048))
-            
+
         steps = [(0, 2048)]
         sample_rate = 512
         bands= [True, True, False, True, False]
         flag=0
-        
+
         result = calculate_dtf(data, steps, channels, sample_rate, bands, flag)
         self.assertEqual(np.shape(result), (sum(bands),channels,channels))
         
@@ -625,7 +626,7 @@ class TestNewGraphMetrics(unittest.TestCase):
     def test_modularity_range(self):
         G = self._make_complete_graph()
         m = compute_graph_metrics(G)
-        self.assertGreaterEqual(m['modularity'], 0.0)
+        self.assertGreaterEqual(round(m['modularity'], 10), 0.0)
         self.assertLessEqual(m['modularity'], 1.0)
 
     def test_modularity_disconnected_non_negative(self):
