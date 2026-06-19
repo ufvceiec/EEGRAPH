@@ -4,6 +4,12 @@ sys.path.append('..')
 import eegraph as eegraph
 from eegraph.tools import *
 
+try:
+    import scot as _scot_check
+    _SCOT_AVAILABLE = True
+except ImportError:
+    _SCOT_AVAILABLE = False
+
 
 class TestTools(unittest.TestCase):
     
