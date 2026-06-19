@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="https://github.com/ufvceiec/EEGRAPH/blob/develop-refactor/demo/eegraph-logo.png" alt="EEGraph Logo"/>
+  <img src="https://raw.githubusercontent.com/ufvceiec/EEGRAPH/feature/graph-metrics/demo/eegraph-logo.png" alt="EEGraph Logo"/>
 </p>
 
-[![GP3 License](https://img.shields.io/github/license/albertonogales/EEGRAPH.svg)](https://github.com/albertonogales/EEGRAPH/blob/main/LICENSE)
+[![GP3 License](https://img.shields.io/github/license/ufvceiec/EEGRAPH.svg)](https://github.com/ufvceiec/EEGRAPH/blob/feature/graph-metrics/LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11-blue.svg)](https://www.python.org/downloads/)
 [![PyPI](https://img.shields.io/pypi/v/EEGRAPH?color=blue)](https://pypi.org/project/EEGRAPH/)
 [![Tests](https://github.com/ufvceiec/EEGRAPH/actions/workflows/tests.yml/badge.svg)](https://github.com/ufvceiec/EEGRAPH/actions/workflows/tests.yml)
