@@ -13,7 +13,7 @@ You can contribute to EEGraph in many ways:
 
 
 ### :scroll: Licensing 
-When you sumbit your code to EEGraph, you implicitly agree to adopt the associated licenses. Your work will be distributed under [GPL-3.0 License](https://github.com/ufvceiec/EEGRAPH/blob/develop-refactor/LICENSE) once your pull request is merged. 
+When you sumbit your code to EEGraph, you implicitly agree to adopt the associated licenses. Your work will be distributed under [GPL-3.0 License](https://github.com/ufvceiec/EEGRAPH/blob/feature/graph-metrics/LICENSE) once your pull request is merged. 
 
 ## :bulb: Suggesting a feature 
 If you have a good idea for a feature please let us know! From improvements for already existing functionalities to completely new features. 
@@ -47,7 +47,7 @@ Please check wheter the solution is already implemented or not before sumbitting
 Make sure:
 - The file extension for code files shoud be `.py`. 
 - Avoid using external libraries for basic algorithms. 
-- If a new library is used that is not listed in the [requirements](https://github.com/ufvceiec/EEGRAPH/blob/develop-refactor/requirements.txt), make sure to add it for your submission. 
+- If a new library is used that is not listed in the [requirements](https://github.com/ufvceiec/EEGRAPH/blob/feature/graph-metrics/requirements.txt), make sure to add it for your submission. 
 - You should try to write tests that ensure the provided code works as expected. 
 - Add or change the [documentation](https://github.com/ufvceiec/EEGRAPH/wiki) as needed. 
 - Make sure the pull request is done to the project´s `develop` branch.

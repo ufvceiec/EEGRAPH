@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+title: "EEGraph: An open-source Python library for modeling electroencephalograms using graphs"
+version: "0.2.0"
+date-released: "2026-06-19"
+license: GPL-3.0-only
+url: "https://github.com/ufvceiec/EEGRAPH"
+repository-code: "https://github.com/ufvceiec/EEGRAPH"
+authors:
+  - family-names: "Maitin"
+    given-names: "Ana María"
+  - family-names: "Nogales"
+    given-names: "Alberto"
+    email: "alberto.nogales@uah.es"
+  - family-names: "Chazarra"
+    given-names: "Pablo"
+  - family-names: "García-Tejedor"
+    given-names: "Álvaro José"
+preferred-citation:
+  type: article
+  title: "EEGraph: An open-source Python library for modeling electroencephalograms using graphs"
+  authors:
+    - family-names: "Maitin"
+      given-names: "Ana María"
+    - family-names: "Nogales"
+      given-names: "Alberto"
+    - family-names: "Chazarra"
+      given-names: "Pablo"
+    - family-names: "García-Tejedor"
+      given-names: "Álvaro José"
+  journal: "Neurocomputing"
+  volume: 519
+  start: 127
+  end: 134
+  year: 2023
+  doi: "10.1016/j.neucom.2022.11.050"

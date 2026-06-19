@@ -32,7 +32,7 @@ setup(
     name='EEGRAPH',
     version='0.2.0',
     description='Open-source Python library for modeling EEGs as graphs',
-    url='https://github.com/albertonogales/EEGRAPH',
+    url='https://github.com/ufvceiec/EEGRAPH',
     author='Alberto Nogales, Álvaro José García-Tejedor',
     author_email='alberto.nogales@uah.es',
     license='GPL-3.0',
