@@ -188,4 +188,4 @@ When adding a new page, also register it in the `nav:` section of `mkdocs.yml`.
 2. Keep commits focused; one logical change per commit.
 3. Ensure all fast unit tests pass before opening a PR.
 4. Update `CHANGELOG.txt` with a brief description under the upcoming version.
-5. Update relevant documentation pages and `CLAUDE.md` if architecture changes.
+5. Update relevant documentation pages.

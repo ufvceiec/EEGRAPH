@@ -26,7 +26,6 @@ Change Log
 - Fixed NumPy ≥ 1.25 DeprecationWarning: Y[f==0] → Y[f==0][0] in obtain_frequency_bands().
 - Fixed NumPy ≥ 1.25 DeprecationWarning: lag_0 extraction uses np.where()[0][0].
 - Fixed invalid escape sequence \s → r"\s" in set_montage() CSV delimiter.
-- Added CLAUDE.md with architecture reference for contributors.
 - Added compute_graph_metrics() and compute_metrics_all() to tools.py for graph-theoretic analysis.
 - Added Graph.compute_metrics() convenience method.
 - Added MkDocs HTML documentation suite (docs/ directory, mkdocs.yml).
